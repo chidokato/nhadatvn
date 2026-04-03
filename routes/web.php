@@ -63,6 +63,7 @@ Route::prefix('admin')->name('backend.')->group(function () {
             Route::put('{post}', [ContentController::class, 'productUpdate'])->name('update');
             Route::delete('{post}', [ContentController::class, 'productDestroy'])->name('destroy');
             Route::patch('{post}/toggle-status', [ContentController::class, 'productToggleStatus'])->name('toggle-status');
+            Route::patch('{post}/toggle-featured', [ContentController::class, 'productToggleFeatured'])->name('toggle-featured');
         });
 
         Route::prefix('news')->name('news.')->group(function () {

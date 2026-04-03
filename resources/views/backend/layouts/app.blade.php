@@ -72,6 +72,21 @@
             padding-right: 8px;
             text-align: center;
         }
+
+        .ck-editor__editable_inline {
+            min-height: 320px;
+        }
+
+        .ck-editor__editable_inline .ck-content p,
+        .ck.ck-editor__editable_inline p {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .ck-editor__editable_inline .ck-content p:last-child,
+        .ck.ck-editor__editable_inline p:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>

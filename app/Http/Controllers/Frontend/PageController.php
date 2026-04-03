@@ -67,6 +67,7 @@ class PageController extends BaseFrontendController
             ->firstOrFail();
 
         $relatedProducts = Post::query()
+            ->with('category')
             ->where('type', Post::TYPE_PRODUCT)
             ->where('is_active', true)
             ->where('id', '!=', $product->id)

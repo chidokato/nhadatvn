@@ -21,6 +21,7 @@
                             <th>Category</th>
                             @if ($type === 'product')
                                 <th>Gia</th>
+                                <th>Du an noi bat</th>
                             @endif
                             <th>Trang thai</th>
                             <th>Ngay dang</th>
@@ -36,7 +37,21 @@
                                 </td>
                                 <td>{{ optional($post->category)->name ?: '-' }}</td>
                                 @if ($type === 'product')
-                                    <td>{{ $post->price !== null ? number_format((float) $post->price, 0, ',', '.') . ' đ' : '-' }}</td>
+                                    <td>{{ $post->price !== null ? number_format((float) $post->price, 0, ',', '.') . ' d' : '-' }}</td>
+                                    <td>
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <button
+                                                type="button"
+                                                class="status-toggle {{ $post->is_featured ? 'is-active' : 'is-inactive' }}"
+                                                data-toggle-status
+                                                data-url="{{ route('backend.products.toggle-featured', $post) }}"
+                                                aria-pressed="{{ $post->is_featured ? 'true' : 'false' }}"
+                                            ></button>
+                                            <span class="status-toggle-label {{ $post->is_featured ? 'text-success' : 'text-danger' }}" data-status-label>
+                                                {{ $post->is_featured ? 'Bat' : 'Tat' }}
+                                            </span>
+                                        </div>
+                                    </td>
                                 @endif
                                 <td>
                                     <div class="d-inline-flex align-items-center gap-2">
@@ -64,7 +79,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ $type === 'product' ? 6 : 5 }}" class="text-center text-muted py-4">
+                                <td colspan="{{ $type === 'product' ? 7 : 5 }}" class="text-center text-muted py-4">
                                     Chua co {{ strtolower($typeLabel) }} nao.
                                 </td>
                             </tr>

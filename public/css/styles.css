@@ -1661,7 +1661,7 @@ a:focus, a:hover {
 }
 
 .site-logo {
-  max-width: 222px;
+  max-width: 89px;
 }
 @media (max-width: 991px) {
   .site-logo {
@@ -2066,7 +2066,7 @@ a:focus, a:hover {
   justify-content: space-between;
 }
 .header .site-logo {
-  padding: 20.3px 0;
+  padding: 0;
 }
 .header.style-default {
   border-bottom: 1px solid var(--Line);

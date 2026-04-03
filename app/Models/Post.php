@@ -40,11 +40,13 @@ class Post extends Model
         'image',
         'price',
         'is_active',
+        'is_featured',
         'published_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'area' => 'decimal:2',
         'area_from' => 'decimal:2',
         'area_to' => 'decimal:2',

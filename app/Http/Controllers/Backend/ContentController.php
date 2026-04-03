@@ -79,6 +79,22 @@ class ContentController extends Controller
         return $this->toggleStatusByType($post, Post::TYPE_PRODUCT);
     }
 
+    public function productToggleFeatured(Post $post)
+    {
+        abort_unless($post->type === Post::TYPE_PRODUCT, 404);
+
+        $post->update([
+            'is_featured' => ! $post->is_featured,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cap nhat trang thai du an noi bat thanh cong.',
+            'is_active' => $post->is_featured,
+            'label' => $post->is_featured ? 'Bat' : 'Tat',
+        ]);
+    }
+
     public function newsToggleStatus(Post $post)
     {
         return $this->toggleStatusByType($post, Post::TYPE_NEWS);
@@ -156,6 +172,12 @@ class ContentController extends Controller
         $post->update($this->payload($request, $validated, $type, $post));
         $this->syncGalleryImages($request, $post, $type);
 
+        if ($request->boolean('save_stay')) {
+            return redirect()
+                ->route($this->routePrefix($type) . '.edit', $post)
+                ->with('success', 'Cap nhat ' . strtolower(Post::types()[$type]) . ' thanh cong.');
+        }
+
         return redirect()
             ->route($this->routePrefix($type) . '.index')
             ->with('success', 'Cap nhat ' . strtolower(Post::types()[$type]) . ' thanh cong.');
@@ -232,8 +254,12 @@ class ContentController extends Controller
             'price' => $type === Post::TYPE_PRODUCT
                 ? ['nullable', 'numeric', 'min:0']
                 : ['nullable'],
+            'price_unit' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', Rule::in(['ty', 'trieu'])]
+                : ['nullable'],
             'published_at' => ['nullable', 'date'],
             'is_active' => ['nullable'],
+            'is_featured' => $type === Post::TYPE_PRODUCT ? ['nullable'] : ['nullable'],
         ]);
 
         if ($this->containsInlineBase64Image($validated['content'] ?? null)) {
@@ -264,6 +290,13 @@ class ContentController extends Controller
             $imagePath = $this->storeImage($request->file('image_file'));
         }
 
+        $price = null;
+
+        if ($type === Post::TYPE_PRODUCT && array_key_exists('price', $validated) && $validated['price'] !== null) {
+            $multiplier = ($validated['price_unit'] ?? 'ty') === 'trieu' ? 1000000 : 1000000000;
+            $price = (float) $validated['price'] * $multiplier;
+        }
+
         return [
             'type' => $type,
             'category_id' => $validated['category_id'] ?? null,
@@ -290,8 +323,9 @@ class ContentController extends Controller
             'bathroom_count_from' => $type === Post::TYPE_PRODUCT ? ($validated['bathroom_count_from'] ?? null) : null,
             'bathroom_count_to' => $type === Post::TYPE_PRODUCT ? ($validated['bathroom_count_to'] ?? null) : null,
             'image' => $imagePath,
-            'price' => $type === Post::TYPE_PRODUCT ? ($validated['price'] ?? null) : null,
+            'price' => $type === Post::TYPE_PRODUCT ? $price : null,
             'is_active' => $request->boolean('is_active'),
+            'is_featured' => $type === Post::TYPE_PRODUCT ? $request->boolean('is_featured') : false,
             'published_at' => $validated['published_at'] ?? null,
         ];
     }

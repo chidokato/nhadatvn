@@ -16,7 +16,7 @@
                         @include('frontend.partials.header-nav')
                         <div class="header-right d-flex align-items-center gap_20">
                             <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                                <span>Submit Property</span>
+                                <span>Tải bảng giá dự án</span>
                                 <span class="bg-effect"></span>
                             </button>
                             <div class="mobile-button d-xl-none" data-bs-toggle="offcanvas"
@@ -45,7 +45,7 @@
                         @include('frontend.partials.header-nav')
                         <div class="header-right d-flex align-items-center gap_20">
                             <button type="button" class="tf-btn md-hide border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                                <span>Submit Property</span>
+                                <span>Tải bảng giá dự án</span>
                                 <span class="bg-effect"></span>
                             </button>
                             <div class="mobile-button d-xl-none" data-bs-toggle="offcanvas"
@@ -74,7 +74,7 @@
                         @include('frontend.partials.header-nav')
                         <div class="header-right d-flex align-items-center gap_20">
                             <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                                <span>Submit Property</span>
+                                <span>Tải bảng giá dự án</span>
                                 <span class="bg-effect"></span>
                             </button>
                             <div class="mobile-button d-xl-none" data-bs-toggle="offcanvas"
@@ -103,7 +103,7 @@
                         @include('frontend.partials.header-nav')
                         <div class="header-right d-flex align-items-center gap_20">
                             <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                                <span>Submit Property</span>
+                                <span>Tải bảng giá dự án</span>
                                 <span class="bg-effect"></span>
                             </button>
                             <div class="mobile-button d-xl-none" data-bs-toggle="offcanvas"

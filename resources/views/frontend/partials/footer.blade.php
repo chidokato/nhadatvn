@@ -112,7 +112,7 @@
             </ul>
             <div class="support">
                 <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                    <span>Submit Property</span>
+                    <span>Tải bảng giá dự án</span>
                     <span class="bg-effect"></span>
                 </button>
                 <a href="#" class="text-need">Need help?</a>

@@ -4,6 +4,22 @@
     $currentImage = old('existing_image', $post->image ?? '');
     $imagePreview = $currentImage ? asset($currentImage) : '';
     $existingGalleryImages = $galleryImages ?? collect();
+    $storedPrice = old('price', null);
+    $storedPriceUnit = old('price_unit', null);
+
+    if ($type === 'product' && $storedPrice === null && isset($post) && $post->price !== null) {
+        if ((float) $post->price >= 1000000000) {
+            $storedPrice = rtrim(rtrim(number_format((float) $post->price / 1000000000, 2, '.', ''), '0'), '.');
+            $storedPriceUnit = 'ty';
+        } else {
+            $storedPrice = rtrim(rtrim(number_format((float) $post->price / 1000000, 2, '.', ''), '0'), '.');
+            $storedPriceUnit = 'trieu';
+        }
+    }
+
+    if ($storedPriceUnit === null) {
+        $storedPriceUnit = 'ty';
+    }
 @endphp
 
 <div class="row">
@@ -223,29 +239,28 @@
                     @enderror
                 </div>
 
-                <div class="row">
-                    <div class="col-12 {{ $type === 'product' ? 'mb-3' : '' }}">
-                        <div class="mb-3">
-                            <label for="published_at" class="form-label">Ngay dang</label>
-                            <input type="datetime-local" id="published_at" name="published_at" class="form-control @error('published_at') is-invalid @enderror" value="{{ old('published_at', isset($post) && $post->published_at ? $post->published_at->format('Y-m-d\\TH:i') : '') }}">
-                            @error('published_at')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    @if ($type === 'product')
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Gia</label>
-                                <input type="number" step="0.01" min="0" id="price" name="price" class="form-control @error('price') is-invalid @enderror" value="{{ old('price', $post->price ?? '') }}">
+                @if ($type === 'product')
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Gia</label>
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <input type="number" step="0.01" min="0" id="price" name="price" class="form-control @error('price') is-invalid @enderror" value="{{ $storedPrice ?? '' }}">
                                 @error('price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                            <div class="col-4">
+                                <select id="price_unit" name="price_unit" class="form-select @error('price_unit') is-invalid @enderror">
+                                    <option value="ty" {{ $storedPriceUnit === 'ty' ? 'selected' : '' }}>Ty</option>
+                                    <option value="trieu" {{ $storedPriceUnit === 'trieu' ? 'selected' : '' }}>Trieu</option>
+                                </select>
+                                @error('price_unit')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @endif
 
                 <div class="card border mb-3">
                     <div class="card-header">
@@ -306,6 +321,13 @@
                     <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $post->is_active ?? true) ? 'checked' : '' }}>
                     <label class="form-check-label" for="is_active">Hien thi {{ strtolower($typeLabel) }}</label>
                 </div>
+
+                @if ($type === 'product')
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured', $post->is_featured ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_featured">Du an noi bat</label>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
