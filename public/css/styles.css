@@ -1661,7 +1661,7 @@ a:focus, a:hover {
 }
 
 .site-logo {
-  max-width: 89px;
+  max-width: 60px;
 }
 @media (max-width: 991px) {
   .site-logo {
