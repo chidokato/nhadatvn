@@ -16,6 +16,7 @@ class Post extends Model
     protected $fillable = [
         'type',
         'category_id',
+        'seller_id',
         'title',
         'slug',
         'seo_title',
@@ -67,6 +68,11 @@ class Post extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function galleryImages()

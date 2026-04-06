@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="card-body">
-            <form id="user-form" action="{{ route('backend.users.update', $user) }}" method="POST">
+            <form id="user-form" action="{{ route('backend.users.update', $user) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 @include('backend.users._form', ['submitLabel' => 'Cap nhat user', 'user' => $user])

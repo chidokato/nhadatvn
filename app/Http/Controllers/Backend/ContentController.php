@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostFloorPlan;
 use App\Models\PostImage;
+use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -137,6 +138,7 @@ class ContentController extends Controller
             'type' => $type,
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
+            'sellerOptions' => $this->sellerOptions(),
             'galleryImages' => collect(),
             'floorPlans' => $this->supportsFloorPlans() ? collect() : collect(),
         ]);
@@ -164,6 +166,7 @@ class ContentController extends Controller
             'type' => $type,
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
+            'sellerOptions' => $this->sellerOptions(),
             'galleryImages' => $post->galleryImages,
             'floorPlans' => $this->supportsFloorPlans() ? $post->floorPlans : collect(),
         ]);
@@ -234,6 +237,9 @@ class ContentController extends Controller
                 'integer',
                 Rule::exists('categories', 'id')->where(fn ($query) => $query->where('type', $type)),
             ],
+            'seller_id' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'integer', Rule::exists('users', 'id')]
+                : ['nullable'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => [
                 'nullable',
@@ -332,6 +338,7 @@ class ContentController extends Controller
         return [
             'type' => $type,
             'category_id' => $validated['category_id'] ?? null,
+            'seller_id' => $type === Post::TYPE_PRODUCT ? ($validated['seller_id'] ?? null) : null,
             'title' => $validated['title'],
             'slug' => $validated['slug'] ?: Str::slug($validated['title']),
             'seo_title' => $validated['seo_title'] ?? null,
@@ -369,6 +376,13 @@ class ContentController extends Controller
             ->where('type', $type)
             ->where('is_active', true)
             ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    protected function sellerOptions()
+    {
+        return User::query()
             ->orderBy('name')
             ->pluck('name', 'id');
     }

@@ -63,6 +63,27 @@
 
         $displayImage = static fn ($path) => asset(ltrim($path, '/'));
         $displayText = static fn ($value, $fallback = 'Dang cap nhat') => filled($value) ? $value : $fallback;
+        $defaultSeller = (object) [
+            'name' => 'Jorge R.',
+            'job_title' => 'Senior Property Manager',
+            'bio' => 'Jorge R. is an experienced agent known for friendly service, local expertise, reliable property guidance across and nearby areas.',
+            'address' => '6205 Peachtree Dunwoody Rd, Atlanta, GA 30328',
+            'phone' => '1-555-678-8888',
+            'secondary_phone' => '1-555-678-8888',
+            'whatsapp_phone' => '15556788888',
+            'avatar' => 'images/section/agent-2.1.jpg',
+        ];
+        $seller = $contactSeller ?? $defaultSeller;
+        $sellerAddress = $displayText($seller->address ?? $defaultSeller->address);
+        $sellerPhone = $displayText($seller->phone ?? $defaultSeller->phone);
+        $sellerSecondaryPhone = filled($seller->secondary_phone ?? null)
+            ? $seller->secondary_phone
+            : (filled($defaultSeller->secondary_phone) ? $defaultSeller->secondary_phone : null);
+        $sellerAvatar = $seller->avatar ?? $defaultSeller->avatar;
+        $callPhone = preg_replace('/\D+/', '', (string) ($seller->phone ?? $defaultSeller->phone));
+        $whatsAppPhone = preg_replace('/\D+/', '', (string) ($seller->whatsapp_phone ?? $seller->phone ?? $defaultSeller->whatsapp_phone));
+        $directionsUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($sellerAddress);
+        $whatsAppUrl = $whatsAppPhone !== '' ? 'https://wa.me/' . $whatsAppPhone : '#';
         $formatNumber = static fn ($value) => filled($value) ? number_format((float) $value, 0, ',', '.') : null;
         $formatDecimal = static fn ($value) => filled($value) ? rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.') : null;
         $formatPrice = static function ($value) use ($formatDecimal, $formatNumber) {
@@ -315,12 +336,12 @@
                                 <h5 class="mb_28">Contact Sellers</h5>
                                 <div class="author mb_28">
                                     <div class="avatar mb_28">
-                                        <img src="{{ asset('images/section/agent-2.1.jpg') }}" width="354" height="354" alt="avatar">
+                                        <img src="{{ $displayImage($sellerAvatar) }}" width="354" height="354" alt="{{ $displayText($seller->name ?? $defaultSeller->name) }}">
                                     </div>
                                     <div class="author-info d-flex flex-column">
-                                        <h6 class="mb_4">Jorge R.</h6>
-                                        <p class="mb_8">Senior Property Manager</p>
-                                        <p>Jorge R. is an experienced agent known for friendly service, local expertise, reliable property guidance across and nearby areas.</p>
+                                        <h6 class="mb_4">{{ $displayText($seller->name ?? $defaultSeller->name) }}</h6>
+                                        <p class="mb_8">{{ $displayText($seller->job_title ?? $defaultSeller->job_title) }}</p>
+                                        <p>{{ $displayText($seller->bio ?? $defaultSeller->bio) }}</p>
                                     </div>
                                 </div>
                                 <div class="mb_28">
@@ -329,24 +350,26 @@
                                         <li class="item d-flex gap_12 mb_20">
                                             <i class="icon icon-MapPin"></i>
                                             <div>
-                                                <p class="text_primary-color mb_4">6205 Peachtree Dunwoody Rd, Atlanta, GA 30328</p>
-                                                <a href="#" class="hover-underline-link text-button fw-7 text_primary-color">Get Directions</a>
+                                                <p class="text_primary-color mb_4">{{ $sellerAddress }}</p>
+                                                <a href="{{ $directionsUrl }}" class="hover-underline-link text-button fw-7 text_primary-color" target="_blank" rel="noopener">Get Directions</a>
                                             </div>
                                         </li>
                                         <li class="item d-flex gap_12 align-items-center">
                                             <i class="icon icon-PhoneCall"></i>
                                             <div>
-                                                <p class="text_primary-color">1-555-678-8888</p>
-                                                <p class="text_primary-color">1-555-678-8888</p>
+                                                <p class="text_primary-color">{{ $sellerPhone }}</p>
+                                                @if (filled($sellerSecondaryPhone))
+                                                    <p class="text_primary-color">{{ $sellerSecondaryPhone }}</p>
+                                                @endif
                                             </div>
                                         </li>
                                     </ul>
                                 </div>
-                                <a href="#" class="tf-btn btn-bg-1 w-full mb_12">
+                                <a href="{{ $callPhone !== '' ? 'tel:' . $callPhone : '#' }}" class="tf-btn btn-bg-1 w-full mb_12">
                                     <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Call To Dealer</span>
                                     <span class="bg-effect"></span>
                                 </a>
-                                <a href="#" class="tf-btn w-full">
+                                <a href="{{ $whatsAppUrl }}" class="tf-btn w-full" target="_blank" rel="noopener">
                                     <span class="d-flex align-items-center gap_8"><i class="icon-ChatCircleDots"></i>Chat via WhatsApp</span>
                                     <span class="bg-effect"></span>
                                 </a>

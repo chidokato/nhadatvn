@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="card-body">
-            <form id="user-form" action="{{ route('backend.users.store') }}" method="POST">
+            <form id="user-form" action="{{ route('backend.users.store') }}" method="POST" enctype="multipart/form-data">
                 @include('backend.users._form', ['submitLabel' => 'Luu user'])
             </form>
         </div>

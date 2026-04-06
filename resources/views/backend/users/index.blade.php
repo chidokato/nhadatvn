@@ -17,6 +17,8 @@
                         <tr>
                             <th>ID</th>
                             <th>Ten</th>
+                            <th>Chuc danh</th>
+                            <th>So dien thoai</th>
                             <th>Email</th>
                             <th>Ngay tao</th>
                             <th class="text-end">Thao tac</th>
@@ -27,6 +29,8 @@
                             <tr>
                                 <td>{{ $user->id }}</td>
                                 <td>{{ $user->name }}</td>
+                                <td>{{ $user->job_title }}</td>
+                                <td>{{ $user->phone }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->created_at ? $user->created_at->format('d/m/Y H:i') : '' }}</td>
                                 <td class="text-end">
@@ -40,7 +44,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">Chua co user nao.</td>
+                                <td colspan="7" class="text-center text-muted py-4">Chua co user nao.</td>
                             </tr>
                         @endforelse
                     </tbody>

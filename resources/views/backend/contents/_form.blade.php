@@ -328,6 +328,19 @@
 
                 @if ($type === 'product')
                     <div class="mb-3">
+                        <label for="seller_id" class="form-label">Seller</label>
+                        <select id="seller_id" name="seller_id" class="form-select @error('seller_id') is-invalid @enderror">
+                            <option value="">Khong chon</option>
+                            @foreach (($sellerOptions ?? collect()) as $id => $name)
+                                <option value="{{ $id }}" {{ (string) old('seller_id', $post->seller_id ?? '') === (string) $id ? 'selected' : '' }}>{{ $name }}</option>
+                            @endforeach
+                        </select>
+                        @error('seller_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="price" class="form-label">Gia</label>
                         <div class="row g-2">
                             <div class="col-8">

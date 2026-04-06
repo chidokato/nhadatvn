@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
 
 class PageController extends BaseFrontendController
 {
@@ -90,7 +91,7 @@ class PageController extends BaseFrontendController
 
         if ($category->type === Category::TYPE_PRODUCT) {
             $product = Post::query()
-                ->with(['category', 'galleryImages'])
+                ->with(['category', 'galleryImages', 'seller'])
                 ->where('type', Post::TYPE_PRODUCT)
                 ->where('is_active', true)
                 ->where('category_id', $category->id)
@@ -113,7 +114,14 @@ class PageController extends BaseFrontendController
 
     protected function renderProductShow(Post $product)
     {
-        
+        $contactSeller = User::query()
+            ->orderBy('id')
+            ->first();
+
+        if ($product->relationLoaded('seller') && $product->seller) {
+            $contactSeller = $product->seller;
+        }
+
         $relatedProducts = Post::query()
             ->with('category')
             ->where('type', Post::TYPE_PRODUCT)
@@ -129,6 +137,7 @@ class PageController extends BaseFrontendController
 
         return view('frontend.products.show', $this->sharedViewData([
             'product' => $product,
+            'contactSeller' => $contactSeller,
             'relatedProducts' => $relatedProducts,
             'pageTitle' => $product->seo_title ?: $product->title,
             'pageDescription' => $product->seo_description ?: $product->summary,

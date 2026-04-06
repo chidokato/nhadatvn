@@ -13,7 +13,14 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'tuan.pn92@gmail.com'],
             [
-                'name' => 'Tuan PN',
+                'name' => 'Jorge R.',
+                'job_title' => 'Senior Property Manager',
+                'bio' => 'Jorge R. is an experienced agent known for friendly service, local expertise, reliable property guidance across and nearby areas.',
+                'address' => '6205 Peachtree Dunwoody Rd, Atlanta, GA 30328',
+                'phone' => '1-555-678-8888',
+                'secondary_phone' => '1-555-678-8888',
+                'whatsapp_phone' => '15556788888',
+                'avatar' => 'images/section/agent-2.1.jpg',
                 'password' => Hash::make('123456'),
             ]
         );
