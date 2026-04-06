@@ -57,7 +57,7 @@ class PageController extends BaseFrontendController
         return $this->newsCategory($slug);
     }
 
-    public function productShow(string $slug)
+    public function legacyProductShow(string $slug)
     {
         $product = Post::query()
             ->with(['category', 'galleryImages'])
@@ -66,6 +66,54 @@ class PageController extends BaseFrontendController
             ->where('slug', $slug)
             ->firstOrFail();
 
+        return redirect()->to($product->frontend_url, 301);
+    }
+
+    public function legacyNewsShow(string $slug)
+    {
+        $post = Post::query()
+            ->with('category')
+            ->where('type', Post::TYPE_NEWS)
+            ->where('is_active', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        return redirect()->to($post->frontend_url, 301);
+    }
+
+    public function contentShow(string $categorySlug, string $slug)
+    {
+        $category = Category::query()
+            ->where('is_active', true)
+            ->where('slug', $categorySlug)
+            ->firstOrFail();
+
+        if ($category->type === Category::TYPE_PRODUCT) {
+            $product = Post::query()
+                ->with(['category', 'galleryImages'])
+                ->where('type', Post::TYPE_PRODUCT)
+                ->where('is_active', true)
+                ->where('category_id', $category->id)
+                ->where('slug', $slug)
+                ->firstOrFail();
+
+            return $this->renderProductShow($product);
+        }
+
+        $post = Post::query()
+            ->with('category')
+            ->where('type', Post::TYPE_NEWS)
+            ->where('is_active', true)
+            ->where('category_id', $category->id)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        return $this->renderNewsShow($post);
+    }
+
+    protected function renderProductShow(Post $product)
+    {
+        
         $relatedProducts = Post::query()
             ->with('category')
             ->where('type', Post::TYPE_PRODUCT)
@@ -150,16 +198,10 @@ class PageController extends BaseFrontendController
         ]));
     }
 
-    public function newsShow(string $slug)
+    protected function renderNewsShow(Post $post)
     {
-        $post = Post::query()
-            ->with('category')
-            ->where('type', Post::TYPE_NEWS)
-            ->where('is_active', true)
-            ->where('slug', $slug)
-            ->firstOrFail();
-
         $relatedPosts = Post::query()
+            ->with('category')
             ->where('type', Post::TYPE_NEWS)
             ->where('is_active', true)
             ->where('id', '!=', $post->id)

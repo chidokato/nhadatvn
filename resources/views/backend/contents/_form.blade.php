@@ -4,6 +4,16 @@
     $currentImage = old('existing_image', $post->image ?? '');
     $imagePreview = $currentImage ? asset($currentImage) : '';
     $existingGalleryImages = $galleryImages ?? collect();
+    $existingFloorPlans = $floorPlans ?? collect();
+    $galleryTypes = \App\Models\PostImage::types();
+    $galleryImagesByType = collect($galleryTypes)
+        ->mapWithKeys(function ($label, $typeKey) use ($existingGalleryImages) {
+            return [
+                $typeKey => $existingGalleryImages
+                    ->filter(fn ($image) => ($image->image_type ?? \App\Models\PostImage::TYPE_PERSPECTIVE) === $typeKey)
+                    ->values(),
+            ];
+        });
     $storedPrice = old('price', null);
     $storedPriceUnit = old('price_unit', null);
 
@@ -19,6 +29,19 @@
 
     if ($storedPriceUnit === null) {
         $storedPriceUnit = 'ty';
+    }
+
+    $oldFloorPlans = old('floor_plans');
+    if ($oldFloorPlans !== null) {
+        $floorPlanItems = collect($oldFloorPlans)->values();
+    } else {
+        $floorPlanItems = $existingFloorPlans
+            ->map(fn ($floorPlan) => [
+                'id' => $floorPlan->id,
+                'name' => $floorPlan->name,
+                'existing_image' => $floorPlan->image,
+            ])
+            ->values();
     }
 @endphp
 
@@ -50,7 +73,7 @@
                     <div class="col-12">
                         <div class="mb-3">
                             <label for="summary" class="form-label">Mo ta ngan</label>
-                            <textarea id="summary" name="summary" rows="3" class="form-control @error('summary') is-invalid @enderror">{{ old('summary', $post->summary ?? '') }}</textarea>
+                            <textarea id="summary" name="summary" rows="3" class="form-control editor @error('summary') is-invalid @enderror">{{ old('summary', $post->summary ?? '') }}</textarea>
                             @error('summary')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -61,8 +84,18 @@
                         <div class="col-12">
                             <div class="mb-3">
                                 <label for="address" class="form-label">Dia chi</label>
-                                <textarea id="address" name="address" rows="2" class="form-control @error('address') is-invalid @enderror">{{ old('address', $post->address ?? '') }}</textarea>
+                                <input type="text" id="address" name="address" class="form-control @error('address') is-invalid @enderror" value="{{ old('address', $post->address ?? '') }}">
                                 @error('address')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="map_embed" class="form-label">Maps</label>
+                                <textarea id="map_embed" name="map_embed" rows="4" class="form-control @error('map_embed') is-invalid @enderror" placeholder="Dan ma nhung Google Maps vao day">{{ old('map_embed', $post->map_embed ?? '') }}</textarea>
+                                @error('map_embed')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -221,6 +254,60 @@
                 </div>
             </div>
         </div>
+
+        @if ($type === 'product')
+            <div class="card border">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0">Mat bang du an</h5>
+                    <button type="button" id="add-floor-plan" class="btn btn-primary btn-sm">Them mat bang</button>
+                </div>
+                <div class="card-body">
+                    @error('floor_plans')
+                        <div class="alert alert-danger py-2">{{ $message }}</div>
+                    @enderror
+                    <div id="floor-plan-list" class="d-flex flex-column gap-3">
+                        @foreach ($floorPlanItems as $index => $floorPlanItem)
+                            @php
+                                $floorPlanImage = $floorPlanItem['existing_image'] ?? '';
+                            @endphp
+                            <div class="border rounded p-3 floor-plan-item" data-floor-plan-item>
+                                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                                    <h6 class="mb-0">Mat bang #{{ $loop->iteration }}</h6>
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-floor-plan">Xoa</button>
+                                </div>
+                                <input type="hidden" name="floor_plans[{{ $index }}][id]" value="{{ $floorPlanItem['id'] ?? '' }}">
+                                <input type="hidden" name="floor_plans[{{ $index }}][existing_image]" value="{{ $floorPlanImage }}">
+                                <div class="row g-3 align-items-start">
+                                    <div class="col-md-4">
+                                        <input type="file" name="floor_plans[{{ $index }}][image_file]" class="d-none floor-plan-file-input" accept="image/*">
+                                        <button type="button" class="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden p-0 w-100 floor-plan-image-box" style="height: 180px;">
+                                            <img src="{{ $floorPlanImage ? asset($floorPlanImage) : '' }}" alt="Floor plan" class="w-100 h-100 object-fit-cover floor-plan-preview {{ $floorPlanImage ? '' : 'd-none' }}">
+                                            <div class="text-center text-muted px-3 floor-plan-placeholder {{ $floorPlanImage ? 'd-none' : '' }}">
+                                                <div class="display-6 mb-2"><i class="ri-image-line"></i></div>
+                                                <div class="fw-semibold">NO IMAGE</div>
+                                                <div>Chon anh mat bang</div>
+                                            </div>
+                                        </button>
+                                        @error("floor_plans.$index.image_file")
+                                            <div class="text-danger small mt-2">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Ten mat bang</label>
+                                        <input type="text" name="floor_plans[{{ $index }}][name]" class="form-control @error("floor_plans.$index.name") is-invalid @enderror" value="{{ $floorPlanItem['name'] ?? '' }}" placeholder="Vi du: Mat bang tang 1">
+                                        @error("floor_plans.$index.name")
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div id="remove-floor-plans-container"></div>
+                    <div class="form-text mt-3">Moi mat bang gom ten va anh. Ban co the them nhieu mat bang cho mot du an.</div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="col-xl-3">
@@ -271,7 +358,9 @@
                         <input type="hidden" name="remove_image" id="remove_image" value="0">
                         <input type="file" id="image_file" name="image_file" class="d-none" accept="image/*">
                         @if ($type === 'product')
-                            <input type="file" id="gallery_files" name="gallery_files[]" class="d-none" accept="image/*" multiple>
+                            <input type="file" id="gallery_files_interior" name="gallery_files_interior[]" class="d-none" accept="image/*" multiple>
+                            <input type="file" id="gallery_files_perspective" name="gallery_files_perspective[]" class="d-none" accept="image/*" multiple>
+                            <input type="file" id="gallery_files_amenity" name="gallery_files_amenity[]" class="d-none" accept="image/*" multiple>
                         @endif
 
                         <div class="d-flex flex-column gap-2">
@@ -293,25 +382,47 @@
                         @enderror
 
                         @if ($type === 'product')
-                            @error('gallery_files.*')
+                            @error('gallery_files_interior.*')
+                                <div class="text-danger small mt-3">{{ $message }}</div>
+                            @enderror
+                            @error('gallery_files_perspective.*')
+                                <div class="text-danger small mt-3">{{ $message }}</div>
+                            @enderror
+                            @error('gallery_files_amenity.*')
                                 <div class="text-danger small mt-3">{{ $message }}</div>
                             @enderror
 
-                            <div class="mt-3">
-                                <div id="gallery-preview-grid" class="d-flex align-items-start gap-2 flex-wrap">
-                                    @foreach ($existingGalleryImages as $galleryImage)
-                                        <div class="position-relative border rounded overflow-hidden bg-light gallery-item" data-gallery-item style="width: 72px; height: 72px;">
-                                            <img src="{{ asset($galleryImage->image) }}" alt="Gallery" class="w-100 h-100 object-fit-cover">
-                                            <input type="hidden" name="existing_gallery_images[]" value="{{ $galleryImage->id }}">
-                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle d-flex align-items-center justify-content-center remove-gallery-item" data-existing-id="{{ $galleryImage->id }}" style="width: 20px; height: 20px; line-height: 1;">x</button>
+                            <div class="mt-3 d-flex flex-column gap-3">
+                                @foreach ($galleryTypes as $galleryType => $galleryLabel)
+                                    <div class="border rounded p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="fw-semibold">{{ $galleryLabel }}</div>
+                                            <button
+                                                type="button"
+                                                class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 gallery-picker-trigger"
+                                                data-gallery-type="{{ $galleryType }}"
+                                                style="width: 42px; height: 42px;"
+                                            >
+                                                <i class="ri-add-line" style="font-size: 24px; color: #7b7b7b;"></i>
+                                            </button>
                                         </div>
-                                    @endforeach
-
-                                    <button type="button" id="gallery-picker-trigger" class="btn btn-light border rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 58px; height: 58px;">
-                                        <i class="ri-add-line" style="font-size: 30px; color: #7b7b7b;"></i>
-                                    </button>
-                                </div>
-                                <div class="form-text mt-2">Co the click hoac drop nhieu anh. Anh se duoc nen truoc khi upload.</div>
+                                        <div id="gallery-preview-grid-{{ $galleryType }}" data-gallery-grid="{{ $galleryType }}" class="d-flex align-items-start gap-2 flex-wrap">
+                                            @foreach ($galleryImagesByType[$galleryType] as $galleryImage)
+                                                <div class="position-relative border rounded overflow-hidden bg-light gallery-item" data-gallery-item style="width: 72px; height: 72px;">
+                                                    <img src="{{ asset($galleryImage->image) }}" alt="Gallery" class="w-100 h-100 object-fit-cover">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle d-flex align-items-center justify-content-center remove-gallery-item"
+                                                        data-existing-id="{{ $galleryImage->id }}"
+                                                        data-gallery-type="{{ $galleryType }}"
+                                                        style="width: 20px; height: 20px; line-height: 1;"
+                                                    >x</button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                                <div class="form-text mt-0">Moi nhom anh co khu upload rieng. Anh se duoc nen truoc khi upload.</div>
                             </div>
                         @endif
                     </div>
@@ -343,14 +454,20 @@
         var removeImageInput = document.getElementById('remove_image');
         var slugInput = document.getElementById('slug');
         var seoLinkPreview = document.getElementById('seo-link-preview');
-        var galleryInput = document.getElementById('gallery_files');
-        var galleryButton = document.getElementById('gallery-picker-trigger');
-        var galleryGrid = document.getElementById('gallery-preview-grid');
-        var galleryFiles = galleryInput ? new DataTransfer() : null;
+        var galleryTypeKeys = ['interior', 'perspective', 'amenity'];
+        var galleryInputs = {};
+        var galleryGrids = {};
+        var galleryFiles = {};
+        var floorPlanList = document.getElementById('floor-plan-list');
+        var addFloorPlanButton = document.getElementById('add-floor-plan');
+        var removeFloorPlansContainer = document.getElementById('remove-floor-plans-container');
+        var floorPlanIndex = floorPlanList ? floorPlanList.querySelectorAll('[data-floor-plan-item]').length : 0;
 
-        if (!fileInput || !previewBox || !preview || !placeholder || !removeButton || !removeImageInput) {
-            return;
-        }
+        galleryTypeKeys.forEach(function (typeKey) {
+            galleryInputs[typeKey] = document.getElementById('gallery_files_' + typeKey);
+            galleryGrids[typeKey] = document.getElementById('gallery-preview-grid-' + typeKey);
+            galleryFiles[typeKey] = galleryInputs[typeKey] ? new DataTransfer() : null;
+        });
 
         function loadImage(file) {
             return new Promise(function (resolve, reject) {
@@ -467,6 +584,121 @@
             });
         }
 
+        function updateFloorPlanLabels() {
+            if (!floorPlanList) {
+                return;
+            }
+
+            floorPlanList.querySelectorAll('[data-floor-plan-item]').forEach(function (item, index) {
+                var title = item.querySelector('h6');
+                if (title) {
+                    title.textContent = 'Mat bang #' + (index + 1);
+                }
+            });
+        }
+
+        function bindFloorPlanItem(item) {
+            if (!item) {
+                return;
+            }
+
+            var imageBox = item.querySelector('.floor-plan-image-box');
+            var fileInput = item.querySelector('.floor-plan-file-input');
+            var previewImage = item.querySelector('.floor-plan-preview');
+            var placeholderBox = item.querySelector('.floor-plan-placeholder');
+            var removeButton = item.querySelector('.remove-floor-plan');
+
+            function showFloorPlanPreview(src) {
+                previewImage.src = src;
+                previewImage.classList.remove('d-none');
+                placeholderBox.classList.add('d-none');
+            }
+
+            async function applyFloorPlanImage(file) {
+                if (!file) {
+                    return;
+                }
+
+                var compressedFile = await compressImage(file, {
+                    maxWidth: 1800,
+                    maxHeight: 1800,
+                    quality: 0.82
+                });
+                var transfer = createDataTransfer([compressedFile]);
+                fileInput.files = transfer.files;
+
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    showFloorPlanPreview(event.target.result);
+                };
+                reader.readAsDataURL(compressedFile);
+            }
+
+            if (imageBox && fileInput) {
+                imageBox.addEventListener('click', function () {
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', function (event) {
+                    applyFloorPlanImage((event.target.files || [])[0]);
+                });
+
+                bindDropZone(imageBox, function (files) {
+                    applyFloorPlanImage(files[0]);
+                });
+            }
+
+            if (removeButton) {
+                removeButton.addEventListener('click', function () {
+                    var idInput = item.querySelector('input[name$="[id]"]');
+                    if (idInput && idInput.value && removeFloorPlansContainer) {
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'remove_floor_plans[]';
+                        hiddenInput.value = idInput.value;
+                        removeFloorPlansContainer.appendChild(hiddenInput);
+                    }
+
+                    item.remove();
+                    updateFloorPlanLabels();
+                });
+            }
+        }
+
+        function createFloorPlanItem(index) {
+            var wrapper = document.createElement('div');
+            wrapper.className = 'border rounded p-3 floor-plan-item';
+            wrapper.setAttribute('data-floor-plan-item', '');
+            wrapper.innerHTML = [
+                '<div class="d-flex align-items-start justify-content-between gap-3 mb-3">',
+                '<h6 class="mb-0">Mat bang #' + (index + 1) + '</h6>',
+                '<button type="button" class="btn btn-outline-danger btn-sm remove-floor-plan">Xoa</button>',
+                '</div>',
+                '<input type="hidden" name="floor_plans[' + index + '][id]" value="">',
+                '<input type="hidden" name="floor_plans[' + index + '][existing_image]" value="">',
+                '<div class="row g-3 align-items-start">',
+                '<div class="col-md-4">',
+                '<input type="file" name="floor_plans[' + index + '][image_file]" class="d-none floor-plan-file-input" accept="image/*">',
+                '<button type="button" class="border rounded bg-light d-flex align-items-center justify-content-center overflow-hidden p-0 w-100 floor-plan-image-box" style="height: 180px;">',
+                '<div class="text-center text-muted px-3 floor-plan-placeholder">',
+                '<div class="display-6 mb-2"><i class="ri-image-line"></i></div>',
+                '<div class="fw-semibold">NO IMAGE</div>',
+                '<div>Chon anh mat bang</div>',
+                '</div>',
+                '<img src="" alt="Floor plan" class="w-100 h-100 object-fit-cover floor-plan-preview d-none">',
+                '</button>',
+                '</div>',
+                '<div class="col-md-8">',
+                '<label class="form-label">Ten mat bang</label>',
+                '<input type="text" name="floor_plans[' + index + '][name]" class="form-control" placeholder="Vi du: Mat bang tang 1">',
+                '</div>',
+                '</div>'
+            ].join('');
+
+            bindFloorPlanItem(wrapper);
+            return wrapper;
+        }
+
         function showPlaceholder() {
             preview.src = '';
             preview.classList.add('d-none');
@@ -503,27 +735,29 @@
             reader.readAsDataURL(compressedFile);
         }
 
-        previewBox.addEventListener('click', function () {
-            fileInput.click();
-        });
+        if (fileInput && previewBox && preview && placeholder && removeButton && removeImageInput) {
+            previewBox.addEventListener('click', function () {
+                fileInput.click();
+            });
 
-        fileInput.addEventListener('change', function (event) {
-            var file = event.target.files[0];
+            fileInput.addEventListener('change', function (event) {
+                var file = event.target.files[0];
 
-            if (file) {
-                applyMainImage(file);
-            }
-        });
+                if (file) {
+                    applyMainImage(file);
+                }
+            });
 
-        removeButton.addEventListener('click', function () {
-            fileInput.value = '';
-            removeImageInput.value = '1';
-            showPlaceholder();
-        });
+            removeButton.addEventListener('click', function () {
+                fileInput.value = '';
+                removeImageInput.value = '1';
+                showPlaceholder();
+            });
 
-        bindDropZone(previewBox, function (files) {
-            applyMainImage(files[0]);
-        });
+            bindDropZone(previewBox, function (files) {
+                applyMainImage(files[0]);
+            });
+        }
 
         function updateSeoPreview() {
             if (!slugInput || !seoLinkPreview) {
@@ -540,7 +774,9 @@
         }
         updateSeoPreview();
 
-        function appendGalleryItem(src, existingId, fileToken) {
+        function appendGalleryItem(typeKey, src, existingId, fileToken) {
+            var galleryGrid = galleryGrids[typeKey];
+
             if (!galleryGrid) {
                 return;
             }
@@ -572,18 +808,18 @@
                 button.dataset.fileToken = fileToken;
             }
 
+            button.dataset.galleryType = typeKey;
+
             wrapper.appendChild(image);
             wrapper.appendChild(button);
-
-            if (galleryButton && galleryButton.parentNode === galleryGrid) {
-                galleryGrid.insertBefore(wrapper, galleryButton);
-            } else {
-                galleryGrid.appendChild(wrapper);
-            }
+            galleryGrid.appendChild(wrapper);
         }
 
-        async function addGalleryFiles(files) {
-            if (!galleryInput || !galleryFiles) {
+        async function addGalleryFiles(typeKey, files) {
+            var galleryInput = galleryInputs[typeKey];
+            var galleryTransfer = galleryFiles[typeKey];
+
+            if (!galleryInput || !galleryTransfer) {
                 return;
             }
 
@@ -594,31 +830,39 @@
                     quality: 0.8
                 });
                 let currentToken = [compressedFile.name, compressedFile.size, compressedFile.lastModified].join('__');
-                galleryFiles.items.add(compressedFile);
+                galleryTransfer.items.add(compressedFile);
 
                 var reader = new FileReader();
                 reader.onload = function (event) {
-                    appendGalleryItem(event.target.result, null, currentToken);
+                    appendGalleryItem(typeKey, event.target.result, null, currentToken);
                 };
                 reader.readAsDataURL(compressedFile);
             }
 
-            galleryInput.files = galleryFiles.files;
+            galleryInput.files = galleryTransfer.files;
         }
 
-        if (galleryButton && galleryInput) {
-            galleryButton.addEventListener('click', function () {
+        document.querySelectorAll('.gallery-picker-trigger').forEach(function (button) {
+            var typeKey = button.getAttribute('data-gallery-type');
+            var galleryInput = galleryInputs[typeKey];
+            var galleryGrid = galleryGrids[typeKey];
+
+            if (!galleryInput || !galleryGrid) {
+                return;
+            }
+
+            button.addEventListener('click', function () {
                 galleryInput.click();
             });
 
             galleryInput.addEventListener('change', function (event) {
-                addGalleryFiles(Array.from(event.target.files || []));
+                addGalleryFiles(typeKey, Array.from(event.target.files || []));
             });
 
             bindDropZone(galleryGrid, function (files) {
-                addGalleryFiles(files);
+                addGalleryFiles(typeKey, files);
             });
-        }
+        });
 
         document.addEventListener('click', function (event) {
             var removeGalleryButton = event.target.closest('.remove-gallery-item');
@@ -629,6 +873,10 @@
 
             var existingId = removeGalleryButton.getAttribute('data-existing-id');
             var fileToken = removeGalleryButton.getAttribute('data-file-token');
+            var galleryType = removeGalleryButton.getAttribute('data-gallery-type');
+            var galleryGrid = galleryGrids[galleryType];
+            var galleryInput = galleryInputs[galleryType];
+            var galleryTransfer = galleryFiles[galleryType];
 
             if (existingId && galleryGrid) {
                 var input = document.createElement('input');
@@ -638,7 +886,7 @@
                 galleryGrid.appendChild(input);
             }
 
-            if (fileToken && galleryInput && galleryFiles) {
+            if (fileToken && galleryInput && galleryTransfer) {
                 var nextFiles = new DataTransfer();
 
                 Array.from(galleryInput.files).forEach(function (file) {
@@ -649,8 +897,8 @@
                     }
                 });
 
-                galleryFiles = nextFiles;
-                galleryInput.files = galleryFiles.files;
+                galleryFiles[galleryType] = nextFiles;
+                galleryInput.files = galleryFiles[galleryType].files;
             }
 
             var galleryItem = removeGalleryButton.closest('[data-gallery-item]');
@@ -658,5 +906,20 @@
                 galleryItem.remove();
             }
         });
+
+        if (floorPlanList) {
+            floorPlanList.querySelectorAll('[data-floor-plan-item]').forEach(function (item) {
+                bindFloorPlanItem(item);
+            });
+            updateFloorPlanLabels();
+        }
+
+        if (addFloorPlanButton && floorPlanList) {
+            addFloorPlanButton.addEventListener('click', function () {
+                floorPlanList.appendChild(createFloorPlanItem(floorPlanIndex));
+                floorPlanIndex += 1;
+                updateFloorPlanLabels();
+            });
+        }
     });
 </script>

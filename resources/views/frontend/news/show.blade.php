@@ -45,11 +45,11 @@
                             <div class="tf-article-navigation">
                                 @foreach ($relatedPosts->take(2) as $relatedPost)
                                     <div class="item">
-                                        <a href="{{ route('frontend.news.show', $relatedPost->slug) }}" class="hover-underline-link text-button text_primary-color fw-7 mb_8">
+                                        <a href="{{ $relatedPost->frontend_url }}" class="hover-underline-link text-button text_primary-color fw-7 mb_8">
                                             Bai lien quan
                                         </a>
                                         <h5>
-                                            <a href="{{ route('frontend.news.show', $relatedPost->slug) }}" class="link line-clamp-2">
+                                            <a href="{{ $relatedPost->frontend_url }}" class="link line-clamp-2">
                                                 {{ $relatedPost->title }}
                                             </a>
                                         </h5>
@@ -86,7 +86,7 @@
                                 <ul>
                                     @foreach ($recentPosts as $recentPost)
                                         @php
-                                            $recentUrl = route('frontend.news.show', $recentPost->slug);
+                            $recentUrl = $recentPost->frontend_url;
                                             $recentImage = $recentPost->image ? asset($recentPost->image) : asset('images/blog/recent-post-1.jpg');
                                             $recentDate = optional($recentPost->published_at ?: $recentPost->created_at)->format('d/m/Y');
                                         @endphp

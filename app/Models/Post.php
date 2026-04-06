@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Post extends Model
 {
@@ -22,6 +23,7 @@ class Post extends Model
         'summary',
         'content',
         'address',
+        'map_embed',
         'area',
         'area_from',
         'area_to',
@@ -70,5 +72,33 @@ class Post extends Model
     public function galleryImages()
     {
         return $this->hasMany(PostImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function floorPlans()
+    {
+        $relation = $this->hasMany(PostFloorPlan::class)->orderBy('sort_order')->orderBy('id');
+
+        if (! Schema::hasTable('post_floor_plans')) {
+            $relation->getQuery()->from('post_images as post_floor_plans');
+            $relation->whereRaw('1 = 0');
+        }
+
+        return $relation;
+    }
+
+    public function getFrontendUrlAttribute(): string
+    {
+        if ($this->category?->slug) {
+            return route('frontend.content.show', [
+                'categorySlug' => $this->category->slug,
+                'slug' => $this->slug,
+            ]);
+        }
+
+        return match ($this->type) {
+            self::TYPE_PRODUCT => route('frontend.products.show.legacy', $this->slug),
+            self::TYPE_NEWS => route('frontend.news.show.legacy', $this->slug),
+            default => url('/' . ltrim($this->slug, '/')),
+        };
     }
 }

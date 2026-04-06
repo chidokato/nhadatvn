@@ -27,12 +27,12 @@ Route::get('/lien-he', [PageController::class, 'contact'])->name('frontend.conta
 Route::get('/danh-muc-san-pham/{slug}', function (string $slug) {
     return redirect()->route('frontend.categories.show', $slug);
 })->name('frontend.products.category');
-Route::get('/san-pham/{slug}', [PageController::class, 'productShow'])->name('frontend.products.show');
+Route::get('/san-pham/{slug}', [PageController::class, 'legacyProductShow'])->name('frontend.products.show.legacy');
 Route::get('/tin-tuc', [PageController::class, 'newsIndex'])->name('frontend.news.index');
 Route::get('/danh-muc-tin-tuc/{slug}', function (string $slug) {
     return redirect()->route('frontend.categories.show', $slug);
 })->name('frontend.news.category');
-Route::get('/tin-tuc/{slug}', [PageController::class, 'newsShow'])->name('frontend.news.show');
+Route::get('/tin-tuc/{slug}', [PageController::class, 'legacyNewsShow'])->name('frontend.news.show.legacy');
 Route::get('/login', function () {
     return redirect()->route('backend.admin.login');
 })->name('login');
@@ -98,4 +98,5 @@ Route::prefix('admin')->name('backend.')->group(function () {
     });
 });
 
+Route::get('/{categorySlug}/{slug}', [PageController::class, 'contentShow'])->name('frontend.content.show');
 Route::get('/{slug}', [PageController::class, 'categoryBySlug'])->name('frontend.categories.show');

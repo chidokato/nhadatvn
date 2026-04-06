@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\PostFloorPlan;
 use App\Models\PostImage;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -135,6 +138,7 @@ class ContentController extends Controller
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
             'galleryImages' => collect(),
+            'floorPlans' => $this->supportsFloorPlans() ? collect() : collect(),
         ]);
     }
 
@@ -144,6 +148,7 @@ class ContentController extends Controller
 
         $post = Post::create($this->payload($request, $validated, $type));
         $this->syncGalleryImages($request, $post, $type);
+        $this->syncFloorPlans($request, $post, $type);
 
         return redirect()
             ->route($this->routePrefix($type) . '.index')
@@ -160,6 +165,7 @@ class ContentController extends Controller
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
             'galleryImages' => $post->galleryImages,
+            'floorPlans' => $this->supportsFloorPlans() ? $post->floorPlans : collect(),
         ]);
     }
 
@@ -171,6 +177,7 @@ class ContentController extends Controller
 
         $post->update($this->payload($request, $validated, $type, $post));
         $this->syncGalleryImages($request, $post, $type);
+        $this->syncFloorPlans($request, $post, $type);
 
         if ($request->boolean('save_stay')) {
             return redirect()
@@ -190,6 +197,11 @@ class ContentController extends Controller
         $this->deleteImageIfExists($post->image);
         foreach ($post->galleryImages as $image) {
             $this->deleteImageIfExists($image->image);
+        }
+        if ($this->supportsFloorPlans()) {
+            foreach ($post->floorPlans as $floorPlan) {
+                $this->deleteImageIfExists($floorPlan->image);
+            }
         }
         $post->delete();
 
@@ -233,7 +245,8 @@ class ContentController extends Controller
             'seo_description' => ['nullable', 'string'],
             'summary' => ['nullable', 'string'],
             'content' => ['nullable', 'string'],
-            'address' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string', 'max:1000'] : ['nullable'],
+            'address' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'map_embed' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string'] : ['nullable'],
             'area_from' => $type === Post::TYPE_PRODUCT ? ['nullable', 'numeric', 'min:0'] : ['nullable'],
             'area_to' => $type === Post::TYPE_PRODUCT ? ['nullable', 'numeric', 'min:0'] : ['nullable'],
             'floor_count_from' => $type === Post::TYPE_PRODUCT ? ['nullable', 'integer', 'min:0'] : ['nullable'],
@@ -248,8 +261,26 @@ class ContentController extends Controller
             'gallery_files.*' => $type === Post::TYPE_PRODUCT
                 ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
                 : ['nullable'],
+            'gallery_files_interior.*' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
+                : ['nullable'],
+            'gallery_files_perspective.*' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
+                : ['nullable'],
+            'gallery_files_amenity.*' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
+                : ['nullable'],
             'remove_gallery_images' => ['nullable', 'array'],
             'remove_gallery_images.*' => ['integer'],
+            'floor_plans' => $type === Post::TYPE_PRODUCT ? ['nullable', 'array'] : ['nullable'],
+            'floor_plans.*.id' => $type === Post::TYPE_PRODUCT ? ['nullable', 'integer'] : ['nullable'],
+            'floor_plans.*.name' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'floor_plans.*.existing_image' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'floor_plans.*.image_file' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
+                : ['nullable'],
+            'remove_floor_plans' => ['nullable', 'array'],
+            'remove_floor_plans.*' => ['integer'],
             'remove_image' => ['nullable'],
             'price' => $type === Post::TYPE_PRODUCT
                 ? ['nullable', 'numeric', 'min:0']
@@ -269,6 +300,7 @@ class ContentController extends Controller
         }
 
         $this->validateRangeFields($validated, $type);
+        $this->validateFloorPlans($request, $validated, $type);
 
         return $validated;
     }
@@ -307,6 +339,7 @@ class ContentController extends Controller
             'summary' => $validated['summary'] ?? null,
             'content' => $validated['content'] ?? null,
             'address' => $type === Post::TYPE_PRODUCT ? ($validated['address'] ?? null) : null,
+            'map_embed' => $type === Post::TYPE_PRODUCT ? ($validated['map_embed'] ?? null) : null,
             'area' => null,
             'area_from' => $type === Post::TYPE_PRODUCT ? ($validated['area_from'] ?? null) : null,
             'area_to' => $type === Post::TYPE_PRODUCT ? ($validated['area_to'] ?? null) : null,
@@ -351,6 +384,10 @@ class ContentController extends Controller
             return;
         }
 
+        if (! $this->supportsFloorPlans()) {
+            return;
+        }
+
         $removeIds = collect($request->input('remove_gallery_images', []))
             ->map(fn ($id) => (int) $id)
             ->filter();
@@ -364,24 +401,111 @@ class ContentController extends Controller
             }
         }
 
-        if (! $request->hasFile('gallery_files')) {
-            return;
-        }
-
         $sortOrder = (int) $post->galleryImages()->max('sort_order');
 
-        foreach ($request->file('gallery_files') as $file) {
-            if (! $file) {
+        $galleryInputs = [
+            'gallery_files' => PostImage::TYPE_PERSPECTIVE,
+            'gallery_files_interior' => PostImage::TYPE_INTERIOR,
+            'gallery_files_perspective' => PostImage::TYPE_PERSPECTIVE,
+            'gallery_files_amenity' => PostImage::TYPE_AMENITY,
+        ];
+
+        foreach ($galleryInputs as $inputName => $imageType) {
+            if (! $request->hasFile($inputName)) {
                 continue;
             }
 
-            $sortOrder++;
+            foreach ($request->file($inputName) as $file) {
+                if (! $file) {
+                    continue;
+                }
 
-            PostImage::create([
-                'post_id' => $post->id,
-                'image' => $this->storeImage($file),
-                'sort_order' => $sortOrder,
-            ]);
+                $sortOrder++;
+
+                PostImage::create([
+                    'post_id' => $post->id,
+                    'image' => $this->storeImage($file),
+                    'image_type' => $imageType,
+                    'sort_order' => $sortOrder,
+                ]);
+            }
+        }
+    }
+
+    protected function syncFloorPlans(Request $request, Post $post, string $type): void
+    {
+        if ($type !== Post::TYPE_PRODUCT) {
+            return;
+        }
+
+        try {
+            $removeIds = collect($request->input('remove_floor_plans', []))
+                ->map(fn ($id) => (int) $id)
+                ->filter();
+
+            if ($removeIds->isNotEmpty()) {
+                $floorPlansToDelete = $post->floorPlans()->whereIn('id', $removeIds)->get();
+
+                foreach ($floorPlansToDelete as $floorPlan) {
+                    $this->deleteImageIfExists($floorPlan->image);
+                    $floorPlan->delete();
+                }
+            }
+
+            $items = collect($request->input('floor_plans', []))->values();
+            $uploadedFiles = $request->file('floor_plans', []);
+            $existingFloorPlans = $post->floorPlans()->get()->keyBy('id');
+            $sortOrder = 0;
+
+            foreach ($items as $index => $item) {
+                $floorPlanId = isset($item['id']) ? (int) $item['id'] : null;
+
+                if ($floorPlanId && $removeIds->contains($floorPlanId)) {
+                    continue;
+                }
+
+                $name = trim((string) ($item['name'] ?? ''));
+                $existingFloorPlan = $floorPlanId ? $existingFloorPlans->get($floorPlanId) : null;
+                $imageFile = $uploadedFiles[$index]['image_file'] ?? null;
+
+                if (! $existingFloorPlan && $name === '' && ! $imageFile) {
+                    continue;
+                }
+
+                $sortOrder++;
+
+                if ($existingFloorPlan) {
+                    $imagePath = $existingFloorPlan->image;
+
+                    if ($imageFile) {
+                        $this->deleteImageIfExists($imagePath);
+                        $imagePath = $this->storeImage($imageFile);
+                    }
+
+                    $existingFloorPlan->update([
+                        'name' => $name,
+                        'image' => $imagePath,
+                        'sort_order' => $sortOrder,
+                    ]);
+
+                    continue;
+                }
+
+                if (! $imageFile) {
+                    continue;
+                }
+
+                PostFloorPlan::create([
+                    'post_id' => $post->id,
+                    'name' => $name,
+                    'image' => $this->storeImage($imageFile),
+                    'sort_order' => $sortOrder,
+                ]);
+            }
+        } catch (QueryException $exception) {
+            if (($exception->errorInfo[1] ?? null) !== 1146) {
+                throw $exception;
+            }
         }
     }
 
@@ -451,5 +575,48 @@ class ContentController extends Controller
         if ($messages !== []) {
             throw ValidationException::withMessages($messages);
         }
+    }
+
+    protected function validateFloorPlans(Request $request, array $validated, string $type): void
+    {
+        if ($type !== Post::TYPE_PRODUCT) {
+            return;
+        }
+
+        if (! $this->supportsFloorPlans()) {
+            return;
+        }
+
+        $floorPlans = collect($validated['floor_plans'] ?? [])->values();
+        $uploadedFiles = $request->file('floor_plans', []);
+        $messages = [];
+
+        foreach ($floorPlans as $index => $item) {
+            $name = trim((string) ($item['name'] ?? ''));
+            $hasExistingId = ! empty($item['id']);
+            $hasExistingImage = filled($item['existing_image'] ?? null);
+            $hasNewImage = isset($uploadedFiles[$index]['image_file']) && $uploadedFiles[$index]['image_file'] !== null;
+
+            if ($name === '' && ! $hasExistingId && ! $hasExistingImage && ! $hasNewImage) {
+                continue;
+            }
+
+            if ($name === '') {
+                $messages["floor_plans.$index.name"] = 'Ten mat bang khong duoc de trong.';
+            }
+
+            if (! $hasExistingImage && ! $hasNewImage) {
+                $messages["floor_plans.$index.image_file"] = 'Anh mat bang khong duoc de trong.';
+            }
+        }
+
+        if ($messages !== []) {
+            throw ValidationException::withMessages($messages);
+        }
+    }
+
+    protected function supportsFloorPlans(): bool
+    {
+        return Schema::hasTable('post_floor_plans');
     }
 }

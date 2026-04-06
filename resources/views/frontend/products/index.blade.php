@@ -67,6 +67,23 @@
     @php
         $formatNumber = static fn ($value) => filled($value) ? number_format((float) $value, 0, ',', '.') : null;
         $formatDecimal = static fn ($value) => filled($value) ? rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.') : null;
+        $formatPrice = static function ($value) use ($formatDecimal, $formatNumber) {
+            if (! filled($value)) {
+                return null;
+            }
+
+            $amount = (float) $value;
+
+            if ($amount >= 1000000000) {
+                return str_replace('.', ',', $formatDecimal($amount / 1000000000)) . ' ty';
+            }
+
+            if ($amount >= 1000000) {
+                return str_replace('.', ',', $formatDecimal($amount / 1000000)) . ' trieu';
+            }
+
+            return $formatNumber($amount) . ' VND';
+        };
         $formatRange = static function ($from, $to, $suffix = '') use ($formatDecimal) {
             $fromValue = $formatDecimal($from);
             $toValue = $formatDecimal($to);
@@ -87,7 +104,7 @@
         };
 
         $productImage = static fn ($product) => $product->image ? asset(ltrim($product->image, '/')) : asset('images/section/properties-details-12.jpg');
-        $productPrice = static fn ($product) => filled($product->price) ? $formatNumber($product->price) . ' VND' : 'Lien he';
+        $productPrice = static fn ($product) => $formatPrice($product->price) ?: 'Lien he';
         $productArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
         $productBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : $formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN');
         $productBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' PT' : $formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' PT');
@@ -171,11 +188,11 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        <a href="{{ route('frontend.products.show', $product->slug) }}" class="overlay-link"></a>
+                                    <a href="{{ $product->frontend_url }}" class="overlay-link"></a>
                                                     </div>
                                                     <div class="content">
                                                         <h4 class="price mb_12">{{ $price }}</h4>
-                                                        <a href="{{ route('frontend.products.show', $product->slug) }}" class="title mb_8 h5 link text_primary-color">
+                                    <a href="{{ $product->frontend_url }}" class="title mb_8 h5 link text_primary-color">
                                                             {{ $product->title }}
                                                         </a>
                                                         <p>{{ $product->address ?: 'Thong tin vi tri dang cap nhat' }}</p>
@@ -217,7 +234,7 @@
                                                 @endphp
                                                 <div class="card-house style-list v3 product-list-row" data-id="{{ $product->id }}">
                                                     <div class="wrap-img">
-                                                        <a href="{{ route('frontend.products.show', $product->slug) }}" class="img-style">
+                                <a href="{{ $product->frontend_url }}" class="img-style">
                                                             <img loading="lazy" decoding="async" src="{{ $image }}" alt="{{ $product->title }}">
                                                         </a>
                                                     </div>
@@ -233,7 +250,7 @@
                                                                 @endif
                                                             </div>
                                                         </div>
-                                                        <a href="{{ route('frontend.products.show', $product->slug) }}" class="title mb_8 h5 link text_primary-color">
+                                    <a href="{{ $product->frontend_url }}" class="title mb_8 h5 link text_primary-color">
                                                             {{ $product->title }}
                                                         </a>
                                                         <p>{{ $product->address ?: 'Thong tin vi tri dang cap nhat' }}</p>

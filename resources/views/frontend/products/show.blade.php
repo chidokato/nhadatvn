@@ -6,124 +6,82 @@
 @push('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('css/magnific-popup.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.fancybox.min.css') }}">
-    <style>
-        .project-detail-content {
-            color: var(--Secondary);
-            line-height: 1.8;
-        }
-
-        .project-detail-content > *:last-child {
-            margin-bottom: 0;
-        }
-
-        .project-detail-card {
-            padding: 32px;
-            border-radius: 24px;
-            border: 1px solid rgba(20, 24, 32, 0.08);
-            background: #fff;
-        }
-
-        .project-detail-list {
-            display: grid;
-            gap: 14px;
-        }
-
-        .project-detail-list li {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(20, 24, 32, 0.08);
-        }
-
-        .project-detail-list li:last-child {
-            padding-bottom: 0;
-            border-bottom: 0;
-        }
-
-        .project-related-card .img-style {
-            display: block;
-            overflow: hidden;
-            border-radius: 24px;
-        }
-
-        .project-related-card .img-style img {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-        }
-
-        .project-gallery-thumb img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 18px;
-        }
-
-        .project-gallery-main img {
-            width: 100%;
-            height: 680px;
-            object-fit: cover;
-            border-radius: 32px;
-        }
-
-        .project-summary {
-            padding: 24px 28px;
-            border-radius: 24px;
-            background: rgba(246, 247, 249, 1);
-        }
-
-        .project-sticky-box {
-            position: sticky;
-            top: 120px;
-        }
-
-        @media (max-width: 991.98px) {
-            .project-gallery-main img {
-                height: 420px;
-            }
-
-            .project-sticky-box {
-                position: static;
-            }
-        }
-
-        @media (max-width: 767.98px) {
-            .project-detail-card {
-                padding: 24px;
-                border-radius: 20px;
-            }
-
-            .project-gallery-main img {
-                height: 280px;
-                border-radius: 24px;
-            }
-
-            .project-gallery-thumb img {
-                height: 72px;
-                border-radius: 14px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/product-show.css') }}">
 @endpush
 
 @section('content')
     @php
         $gallery = collect([$product->image])
-            ->merge($product->galleryImages->pluck('image'))
+            ->merge(
+                $product->galleryImages
+                    ->filter(fn ($image) => ($image->image_type ?? \App\Models\PostImage::TYPE_PERSPECTIVE) === \App\Models\PostImage::TYPE_PERSPECTIVE)
+                    ->pluck('image')
+            )
             ->filter()
             ->unique()
+            ->take(5)
             ->values();
 
         if ($gallery->isEmpty()) {
             $gallery = collect(['images/section/properties-details-11.jpg']);
         }
 
+        $interiorGallery = $product->galleryImages
+            ->filter(fn ($image) => ($image->image_type ?? \App\Models\PostImage::TYPE_PERSPECTIVE) === \App\Models\PostImage::TYPE_INTERIOR)
+            ->pluck('image')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $amenityGallery = $product->galleryImages
+            ->filter(fn ($image) => ($image->image_type ?? \App\Models\PostImage::TYPE_PERSPECTIVE) === \App\Models\PostImage::TYPE_AMENITY)
+            ->pluck('image')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $buildGalleryGrid = static function ($images) {
+            $images = collect($images)->values();
+
+            if ($images->isEmpty()) {
+                return [
+                    'featured' => null,
+                    'rows' => collect(),
+                    'hidden' => collect(),
+                ];
+            }
+
+            return [
+                'featured' => $images->first(),
+                'rows' => $images->slice(1, 4)->chunk(2),
+                'hidden' => $images->slice(5)->values(),
+            ];
+        };
+
+        $amenityGalleryGrid = $buildGalleryGrid($amenityGallery);
+        $interiorGalleryGrid = $buildGalleryGrid($interiorGallery);
+
         $displayImage = static fn ($path) => asset(ltrim($path, '/'));
         $displayText = static fn ($value, $fallback = 'Dang cap nhat') => filled($value) ? $value : $fallback;
         $formatNumber = static fn ($value) => filled($value) ? number_format((float) $value, 0, ',', '.') : null;
         $formatDecimal = static fn ($value) => filled($value) ? rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.') : null;
+        $formatPrice = static function ($value) use ($formatDecimal, $formatNumber) {
+            if (! filled($value)) {
+                return null;
+            }
+
+            $amount = (float) $value;
+
+            if ($amount >= 1000000000) {
+                return str_replace('.', ',', $formatDecimal($amount / 1000000000)) . ' tỷ';
+            }
+
+            if ($amount >= 1000000) {
+                return str_replace('.', ',', $formatDecimal($amount / 1000000)) . ' triệu';
+            }
+
+            return $formatNumber($amount) . ' VND';
+        };
         $formatRange = static function ($from, $to, $suffix = '') use ($formatDecimal) {
             $fromValue = $formatDecimal($from);
             $toValue = $formatDecimal($to);
@@ -144,12 +102,12 @@
         };
 
         $areaText = $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
-        $floorText = filled($product->floor_count) ? $product->floor_count . ' tang' : $formatRange($product->floor_count_from, $product->floor_count_to, ' tang');
-        $unitText = filled($product->unit_count) ? $product->unit_count . ' can' : $formatRange($product->unit_count_from, $product->unit_count_to, ' can');
-        $bedroomText = filled($product->bedroom_count) ? $product->bedroom_count . ' phong ngu' : $formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' phong ngu');
-        $bathroomText = filled($product->bathroom_count) ? $product->bathroom_count . ' phong tam' : $formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' phong tam');
-        $priceText = filled($product->price) ? $formatNumber($product->price) . ' VND' : 'Lien he';
-        $summaryText = $product->summary ?: strip_tags($product->content ?? '');
+        $floorText = filled($product->floor_count) ? $product->floor_count . ' tầng' : $formatRange($product->floor_count_from, $product->floor_count_to, ' tầng');
+        $unitText = filled($product->unit_count) ? $product->unit_count . ' căn' : $formatRange($product->unit_count_from, $product->unit_count_to, ' căn');
+        $bedroomText = filled($product->bedroom_count) ? $product->bedroom_count . ' ngủ' : $formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' ngủ');
+        $bathroomText = filled($product->bathroom_count) ? $product->bathroom_count . ' wc' : $formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' wc');
+        $priceText = $formatPrice($product->price) ?: 'Liên hệ';
+        $highlightContent = $product->summary;
     @endphp
 
     <div class="main-content section-onepage">
@@ -166,17 +124,8 @@
                             @endif
                             <li>{{ $product->title }}</li>
                         </ul>
-                        <div class="wrap-tag d-flex gap_12 mb_16 flex-wrap">
-                            <div class="tag sale text-title fw-6 text_primary-color">
-                                Du an
-                            </div>
-                            @if ($product->category)
-                                <div class="tag categoreis text-title fw-6 text_primary-color">
-                                    {{ $product->category->name }}
-                                </div>
-                            @endif
-                        </div>
-                        <h2>{{ $product->title }}</h2>
+                        
+                        <h2 class="mt-4">{{ $product->title }}</h2>
                         <ul class="list-action d-flex gap_16 flex-wrap">
                             <li>
                                 <span class="gap_8 d-inline-flex align-items-center">
@@ -184,16 +133,60 @@
                                     <span class="text-button">{{ $displayText($product->address) }}</span>
                                 </span>
                             </li>
-                            <li>
-                                <span class="gap_8 d-inline-flex align-items-center">
-                                    <i class="icon-HouseSimple"></i>
-                                    <span class="text-button">Ma du an: #{{ $product->id }}</span>
-                                </span>
-                            </li>
                         </ul>
                     </div>
+
+                    <div id="tong-quan" class="section mt-5">
+                        <div class="properties-overview v3">
+                            <div class="tf-grid-layout tf-col-2 lg-col-6">
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-SlidersHorizontal"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">Loại hình:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText(optional($product->category)->name) }}</span>
+                                    </div>
+                                </div>
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-Ruler"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">Diện tích:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText($areaText) }}</span>
+                                    </div>
+                                </div>
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-Bed"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">Phòng ngủ:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText($bedroomText) }}</span>
+                                    </div>
+                                </div>
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-Bathstub"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">WC:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText($bathroomText) }}</span>
+                                    </div>
+                                </div>
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-BuildingOffice"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">Số tầng:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText($floorText) }}</span>
+                                    </div>
+                                </div>
+                                <div class="item d-flex gap_16">
+                                    <i class="icon icon-HouseSimple"></i>
+                                    <div class="d-flex flex-column gap">
+                                        <span class="text-body-default">Số căn:</span>
+                                        <span class="text-title fw-6 text_primary-color">{{ $displayText($unitText) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
-                        <h5 class="mb_16">Gia tham khao:</h5>
+                        <h5 class="mb_16">Giá bán:</h5>
                         <h2 class="price">{{ $priceText }}</h2>
                         @if ($product->published_at)
                             <p class="text-body-default text_secondary-color mt_12">
@@ -271,100 +264,20 @@
             <div class="tf-container">
                 <div class="row">
                     <div class="col-lg-8">
-                        <div id="tong-quan" class="section tf-spacing-9">
-                            <div class="properties-overview v3 properties-2">
-                                <h5 class="properties-title mb_20">Tong quan du an</h5>
-                                <div class="tf-grid-layout tf-col-2 lg-col-4">
-                                    <div class="item d-flex gap_16">
-                                        <i class="icon icon-HouseSimple"></i>
-                                        <div class="d-flex flex-column gap">
-                                            <span class="text-body-default">Ma du an:</span>
-                                            <span class="text-title fw-6 text_primary-color">#{{ $product->id }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="item d-flex gap_16">
-                                        <i class="icon icon-SlidersHorizontal"></i>
-                                        <div class="d-flex flex-column gap">
-                                            <span class="text-body-default">Loai hinh:</span>
-                                            <span class="text-title fw-6 text_primary-color">{{ $displayText(optional($product->category)->name) }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="item d-flex gap_16">
-                                        <i class="icon icon-Ruler"></i>
-                                        <div class="d-flex flex-column gap">
-                                            <span class="text-body-default">Dien tich:</span>
-                                            <span class="text-title fw-6 text_primary-color">{{ $displayText($areaText) }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="item d-flex gap_16">
-                                        <i class="icon icon-Money"></i>
-                                        <div class="d-flex flex-column gap">
-                                            <span class="text-body-default">Gia:</span>
-                                            <span class="text-title fw-6 text_primary-color">{{ $priceText }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            @if (filled(trim($summaryText)))
+                        <div id="tong-quan" class="section tf-spacing-9 mb-5">
+                            @if (filled(trim(strip_tags((string) $highlightContent))))
                                 <div class="project-summary mt_32">
-                                    <h5 class="properties-title mb_12">Diem nhan du an</h5>
-                                    <p class="text-body-default text_secondary-color mb-0">{{ \Illuminate\Support\Str::limit(trim($summaryText), 280) }}</p>
+                                    <h5 class="properties-title mb_12">{{ $product->title }}</h5>
+                                    <div class="project-detail-content text-body-default text_secondary-color mb-0">
+                                        {!! $highlightContent !!}
+                                    </div>
                                 </div>
                             @endif
                         </div>
 
-                        <div id="thong-so" class="section tf-spacing-9 pt-0">
+                        <div id="mo-ta" class="section tf-spacing-9 pt-0 mb-5">
                             <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Thong tin chi tiet</h5>
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <ul class="project-detail-list list-unstyled mb-0">
-                                            <li>
-                                                <span class="text-body-default">Danh muc</span>
-                                                <strong class="text_primary-color">{{ $displayText(optional($product->category)->name) }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">Dien tich</span>
-                                                <strong class="text_primary-color">{{ $displayText($areaText) }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">So tang</span>
-                                                <strong class="text_primary-color">{{ $displayText($floorText) }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">So can</span>
-                                                <strong class="text_primary-color">{{ $displayText($unitText) }}</strong>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <ul class="project-detail-list list-unstyled mb-0">
-                                            <li>
-                                                <span class="text-body-default">Phong ngu</span>
-                                                <strong class="text_primary-color">{{ $displayText($bedroomText) }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">Phong tam</span>
-                                                <strong class="text_primary-color">{{ $displayText($bathroomText) }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">Gia tham khao</span>
-                                                <strong class="text_primary-color">{{ $priceText }}</strong>
-                                            </li>
-                                            <li>
-                                                <span class="text-body-default">Ngay dang</span>
-                                                <strong class="text_primary-color">{{ $product->published_at?->format('d/m/Y') ?? 'Dang cap nhat' }}</strong>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="mo-ta" class="section tf-spacing-9 pt-0">
-                            <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Mo ta du an</h5>
+                                <!-- <h5 class="properties-title mb_20">Mô tả về dự án</h5> -->
                                 <div class="project-detail-content">
                                     {!! $product->content ?: '<p>Thong tin mo ta dang duoc cap nhat.</p>' !!}
                                 </div>
@@ -373,58 +286,143 @@
 
                         <div id="vi-tri" class="section tf-spacing-9 pt-0">
                             <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Vi tri du an</h5>
+                                <h5 class="properties-title mb_20">Vị trí dự án</h5>
                                 <p class="text-body-default text_secondary-color mb_12">
-                                    {{ $displayText($product->address, 'Thong tin dia chi dang duoc cap nhat.') }}
+                                    {{ $displayText($product->address, 'Thông tin địa chỉ đang được cập nhật.') }}
                                 </p>
-                                <div class="project-summary">
-                                    <div class="d-flex align-items-start gap_12">
-                                        <i class="icon-MapPin text_primary-color fs-4"></i>
-                                        <div>
-                                            <h6 class="mb_8">Dia chi</h6>
-                                            <p class="text-body-default text_secondary-color mb-0">{{ $displayText($product->address) }}</p>
+                                @if (filled(trim((string) $product->map_embed)))
+                                    <div class="project-map-embed">
+                                        {!! $product->map_embed !!}
+                                    </div>
+                                @else
+                                    <div class="project-summary">
+                                        <div class="d-flex align-items-start gap_12">
+                                            <div>
+                                                <p class="text-body-default text_secondary-color mb-0">{{ $displayText($product->address) }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </div>
+
+                        
                     </div>
 
                     <div class="col-lg-4">
                         <div class="project-sticky-box tf-spacing-9">
-                            <div class="project-detail-card mb_30">
-                                <h5 class="properties-title mb_20">Nhan thong tin du an</h5>
-                                <p class="text-body-default text_secondary-color mb_20">
-                                    De lai thong tin de chung toi gui bang gia, mat bang va chinh sach moi nhat cua du an.
-                                </p>
-                                <button type="button" class="tf-btn w-100 border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                                    <span>Dang ky tu van</span>
+                            <div class="box-sellers style-1 project-contact-box">
+                                <h5 class="mb_28">Contact Sellers</h5>
+                                <div class="author mb_28">
+                                    <div class="avatar mb_28">
+                                        <img src="{{ asset('images/section/agent-2.1.jpg') }}" width="354" height="354" alt="avatar">
+                                    </div>
+                                    <div class="author-info d-flex flex-column">
+                                        <h6 class="mb_4">Jorge R.</h6>
+                                        <p class="mb_8">Senior Property Manager</p>
+                                        <p>Jorge R. is an experienced agent known for friendly service, local expertise, reliable property guidance across and nearby areas.</p>
+                                    </div>
+                                </div>
+                                <div class="mb_28">
+                                    <h6 class="mb_16">Infomation</h6>
+                                    <ul class="info">
+                                        <li class="item d-flex gap_12 mb_20">
+                                            <i class="icon icon-MapPin"></i>
+                                            <div>
+                                                <p class="text_primary-color mb_4">6205 Peachtree Dunwoody Rd, Atlanta, GA 30328</p>
+                                                <a href="#" class="hover-underline-link text-button fw-7 text_primary-color">Get Directions</a>
+                                            </div>
+                                        </li>
+                                        <li class="item d-flex gap_12 align-items-center">
+                                            <i class="icon icon-PhoneCall"></i>
+                                            <div>
+                                                <p class="text_primary-color">1-555-678-8888</p>
+                                                <p class="text_primary-color">1-555-678-8888</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <a href="#" class="tf-btn btn-bg-1 w-full mb_12">
+                                    <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Call To Dealer</span>
                                     <span class="bg-effect"></span>
-                                </button>
+                                </a>
+                                <a href="#" class="tf-btn w-full">
+                                    <span class="d-flex align-items-center gap_8"><i class="icon-ChatCircleDots"></i>Chat via WhatsApp</span>
+                                    <span class="bg-effect"></span>
+                                </a>
                             </div>
 
-                            <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Thong tin nhanh</h5>
-                                <ul class="project-detail-list list-unstyled mb-0">
-                                    <li>
-                                        <span class="text-body-default">So hinh anh</span>
-                                        <strong class="text_primary-color">{{ $gallery->count() }}</strong>
-                                    </li>
-                                    <li>
-                                        <span class="text-body-default">Slug</span>
-                                        <strong class="text_primary-color">{{ $product->slug }}</strong>
-                                    </li>
-                                    <li>
-                                        <span class="text-body-default">Trang thai</span>
-                                        <strong class="text_primary-color">Dang hien thi</strong>
-                                    </li>
-                                    <li>
-                                        <span class="text-body-default">Danh muc</span>
-                                        <strong class="text_primary-color">{{ $displayText(optional($product->category)->name) }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
+                            
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        @if ($amenityGallery->isNotEmpty() || $interiorGallery->isNotEmpty())
+                            <div class="project-subgallery-stack section tf-spacing-9 pt-0 mt-5">
+                                @if ($amenityGallery->isNotEmpty())
+                                    <div class="project-gallery-panel">
+                                        <h5 class="properties-title mb_20">Anh tien ich</h5>
+                                        <div class="properties-gallery project-gallery-grid">
+                                            <div class="tf-grid-layout md-col-2 gap_20">
+                                                <div class="img-style position-relative project-gallery-featured">
+                                                    <a href="{{ $displayImage($amenityGalleryGrid['featured']) }}" data-fancybox="project-amenity-gallery">
+                                                        <img src="{{ $displayImage($amenityGalleryGrid['featured']) }}" alt="{{ $product->title }} amenity">
+                                                    </a>
+                                                </div>
+                                                <div class="project-gallery-secondary">
+                                                    @foreach ($amenityGalleryGrid['rows'] as $galleryRow)
+                                                        <div class="wrap-img d-flex gap_20 {{ $loop->last ? '' : 'mb_20' }}">
+                                                            @foreach ($galleryRow as $image)
+                                                                <a href="{{ $displayImage($image) }}" data-fancybox="project-amenity-gallery" class="project-gallery-secondary-item">
+                                                                    <img src="{{ $displayImage($image) }}" alt="{{ $product->title }} amenity">
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @foreach ($amenityGalleryGrid['hidden'] as $image)
+                                                <a href="{{ $displayImage($image) }}" data-fancybox="project-amenity-gallery" class="d-none">
+                                                    <img src="{{ $displayImage($image) }}" alt="{{ $product->title }} amenity">
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if ($interiorGallery->isNotEmpty())
+                                    <div class="project-gallery-panel">
+                                        <h5 class="properties-title mb_20">Anh noi that</h5>
+                                        <div class="properties-gallery project-gallery-grid">
+                                            <div class="tf-grid-layout md-col-2 gap_20">
+                                                <div class="img-style position-relative project-gallery-featured">
+                                                    <a href="{{ $displayImage($interiorGalleryGrid['featured']) }}" data-fancybox="project-interior-gallery">
+                                                        <img src="{{ $displayImage($interiorGalleryGrid['featured']) }}" alt="{{ $product->title }} interior">
+                                                    </a>
+                                                </div>
+                                                <div class="project-gallery-secondary">
+                                                    @foreach ($interiorGalleryGrid['rows'] as $galleryRow)
+                                                        <div class="wrap-img d-flex gap_20 {{ $loop->last ? '' : 'mb_20' }}">
+                                                            @foreach ($galleryRow as $image)
+                                                                <a href="{{ $displayImage($image) }}" data-fancybox="project-interior-gallery" class="project-gallery-secondary-item">
+                                                                    <img src="{{ $displayImage($image) }}" alt="{{ $product->title }} interior">
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            @foreach ($interiorGalleryGrid['hidden'] as $image)
+                                                <a href="{{ $displayImage($image) }}" data-fancybox="project-interior-gallery" class="d-none">
+                                                    <img src="{{ $displayImage($image) }}" alt="{{ $product->title }} interior">
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -434,20 +432,20 @@
             <div class="tf-container tf-spacing-1 pt-0">
                 <div class="heading-section mb_48 d-flex justify-content-between align-items-end gap_20 flex-wrap">
                     <div>
-                        <h3>Du an lien quan</h3>
-                        <p class="text-body-default text_secondary-color mb-0">Nhung du an khac co the phu hop voi nhu cau cua ban.</p>
+                        <h3>Dự án liên quan</h3>
+                        <p class="text-body-default text_secondary-color mb-0">Những dự án khác có thể phù hợp với nhu cầu của bạn.</p>
                     </div>
                 </div>
                 <div class="row g-4">
                     @foreach ($relatedProducts as $relatedProduct)
                         @php
                             $relatedImage = $relatedProduct->image ? $displayImage($relatedProduct->image) : asset('images/section/properties-details-12.jpg');
-                            $relatedPrice = filled($relatedProduct->price) ? $formatNumber($relatedProduct->price) . ' VND' : 'Lien he';
+                            $relatedPrice = $formatPrice($relatedProduct->price) ?: 'Lien he';
                             $relatedArea = $relatedProduct->area ? $formatDecimal($relatedProduct->area) . ' m2' : $formatRange($relatedProduct->area_from, $relatedProduct->area_to, ' m2');
                         @endphp
                         <div class="col-lg-4 col-md-6">
                             <div class="card-house style-default project-related-card h-100">
-                                <a href="{{ route('frontend.products.show', $relatedProduct->slug) }}" class="img-style mb_20">
+                            <a href="{{ $relatedProduct->frontend_url }}" class="img-style mb_20">
                                     <img src="{{ $relatedImage }}" alt="{{ $relatedProduct->title }}">
                                 </a>
                                 <div class="content">
@@ -460,7 +458,7 @@
                                         @endif
                                     </div>
                                     <h4 class="price mb_12">{{ $relatedPrice }}</h4>
-                                    <a href="{{ route('frontend.products.show', $relatedProduct->slug) }}" class="title mb_8 h5 link text_primary-color">
+                            <a href="{{ $relatedProduct->frontend_url }}" class="title mb_8 h5 link text_primary-color">
                                         {{ $relatedProduct->title }}
                                     </a>
                                     <p>{{ $displayText($relatedProduct->address) }}</p>
@@ -486,3 +484,5 @@
     <script src="{{ asset('js/jquery.fancybox.js') }}"></script>
     <script src="{{ asset('js/magnific-popup.min.js') }}"></script>
 @endpush
+
+

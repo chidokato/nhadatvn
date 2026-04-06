@@ -2,6 +2,23 @@
     $heroProducts = ($featuredProducts ?? collect())->take(3)->values();
     $formatNumber = static fn ($value) => filled($value) ? number_format((float) $value, 0, ',', '.') : null;
     $formatDecimal = static fn ($value) => filled($value) ? rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.') : null;
+    $formatPrice = static function ($value) use ($formatDecimal, $formatNumber) {
+        if (! filled($value)) {
+            return null;
+        }
+
+        $amount = (float) $value;
+
+        if ($amount >= 1000000000) {
+            return str_replace('.', ',', $formatDecimal($amount / 1000000000)) . ' tỷ';
+        }
+
+        if ($amount >= 1000000) {
+            return str_replace('.', ',', $formatDecimal($amount / 1000000)) . ' triệu';
+        }
+
+        return $formatNumber($amount) . ' VND';
+    };
     $formatRange = static function ($from, $to, $suffix = '') use ($formatDecimal) {
         $fromValue = $formatDecimal($from);
         $toValue = $formatDecimal($to);
@@ -21,13 +38,13 @@
         return null;
     };
     $heroImage = static fn ($product, $fallback) => asset(ltrim($product->image ?: $fallback, '/'));
-    $heroPrice = static fn ($product) => filled($product->price) ? $formatNumber($product->price) . ' VND' : 'Liên hệ';
+    $heroPrice = static fn ($product) => $formatPrice($product->price) ?: 'Liên hệ';
     $heroArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
     $heroBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, 'PN') ?: 'Đang cập nhật');
     $heroBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: 'Đang cập nhật');
     $latestHomeProducts = ($latestProducts ?? collect())->take(3)->values();
     $latestHomeImage = static fn ($path, $fallback) => asset(ltrim($path ?: $fallback, '/'));
-    $latestHomePrice = static fn ($product) => filled($product->price) ? $formatNumber($product->price) . ' VND' : 'Lien he';
+    $latestHomePrice = static fn ($product) => $formatPrice($product->price) ?: 'Lien he';
     $latestHomeArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : ($formatRange($product->area_from, $product->area_to, ' m2') ?: 'Dang cap nhat');
     $latestHomeBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN') ?: 'Dang cap nhat');
     $latestHomeBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: 'Dang cap nhat');
@@ -67,7 +84,7 @@
                                                         <h4 class="price mb_12 effect-left effect-item effect-4">
                                                             {{ $heroPrice($product) }}
                                                         </h4>
-                                                        <h4 class="title mb_8 effect-left effect-item effect-5"><a href="{{ route('frontend.products.show', $product->slug) }}">{{ $product->title }}</a></h4>
+                                                        <h4 class="title mb_8 effect-left effect-item effect-5"><a href="{{ $product->frontend_url }}">{{ $product->title }}</a></h4>
                                                         <p class="effect-left effect-item effect-6">{{ $product->address ?: 'Thông tin vị trí đang cập nhật' }}</p>
                                                         <ul class="info d-flex effect-up effect-item effect-7">
                                                             <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
@@ -123,7 +140,7 @@
                     <div class="d-grid gap_30">
                         @forelse ($latestHomeProducts as $index => $product)
                             @php
-                                $detailUrl = route('frontend.products.show', $product->slug);
+                                $detailUrl = $product->frontend_url;
                                 $fallbackIndex = ($index % 3) + 1;
                                 $galleryImages = $product->galleryImages->pluck('image')->filter()->values();
                                 $mainImage = $latestHomeImage($product->image, 'images/home/home-list-' . $fallbackIndex . '.jpg');
@@ -153,10 +170,10 @@
                                         <h4 class="price ">{{ $latestHomePrice($product) }}</h4>
                                         <div class="wrap-tag d-flex gap_8">
                                             <div class="tag rent text-button-small fw-6 text_primary-color">
-                                                Moi nhat
+                                                Mới nhất
                                             </div>
                                             <div class="tag categoreis text-button-small fw-6 text_primary-color">
-                                                {{ $product->category->name ?? 'Du an' }}
+                                                {{ $product->category->name ?? 'Dự án' }}
                                             </div>
                                         </div>
                                     </div>
@@ -173,25 +190,16 @@
                                             <i class="icon-Ruler"></i>{{ $latestHomeArea($product) }}
                                         </li>
                                     </ul>
-                                    <div class="wrap-btn">
-                                        <a href="{{ $detailUrl }}" class="tf-btn btn-border-2 w-full quick-view">
-                                            <span>Quick View</span>
-                                            <span class="bg-effect"></span>
-                                        </a>
-                                        <a href="{{ $detailUrl }}" class="tf-btn btn-border-2 w-full compare">
-                                            <span>Compare</span>
-                                            <span class="bg-effect"></span>
-                                        </a>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         @empty
                             <div class="card-house style-list v1 scrolling-effect effectBottom">
                                 <div class="content">
                                     <div class="d-flex align-items-center gap_12 mb_16 flex-wrap justify-content-between">
-                                        <h4 class="price ">Chua co du an moi</h4>
+                                        <h4 class="price ">Chưa có dự án</h4>
                                     </div>
-                                    <p>Noi dung se duoc cap nhat som.</p>
+                                    <p>Nội dung sẽ được cập nhật sớm.</p>
                                 </div>
                             </div>
                         @endforelse
@@ -361,7 +369,7 @@
                         <div class="swiper-wrapper ">
                             @forelse ($latestNewsItems as $index => $post)
                                 @php
-                                    $newsUrl = route('frontend.news.show', $post->slug);
+                                    $newsUrl = $post->frontend_url;
                                     $fallbackImage = match ($index) {
                                         1 => 'images/blog/blog-item-10.jpg',
                                         2 => 'images/blog/blog-item-2.jpg',

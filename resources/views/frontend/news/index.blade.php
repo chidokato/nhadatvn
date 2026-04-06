@@ -23,7 +23,7 @@
                 <div class="wrap-blog style-list">
                     @forelse ($posts as $post)
                         @php
-                            $postUrl = route('frontend.news.show', $post->slug);
+                        $postUrl = $post->frontend_url;
                             $postImage = $post->image ? asset($post->image) : asset('images/blog/blog-item-list-1.jpg');
                             $displayDate = optional($post->published_at ?: $post->created_at)->format('d/m/Y');
                             $description = $post->summary ?: \Illuminate\Support\Str::limit(strip_tags($post->content), 180);
@@ -91,7 +91,7 @@
                             <ul>
                                 @foreach ($recentPosts as $recentPost)
                                     @php
-                                        $recentUrl = route('frontend.news.show', $recentPost->slug);
+                            $recentUrl = $recentPost->frontend_url;
                                         $recentImage = $recentPost->image ? asset($recentPost->image) : asset('images/blog/recent-post-1.jpg');
                                         $recentDate = optional($recentPost->published_at ?: $recentPost->created_at)->format('d/m/Y');
                                     @endphp

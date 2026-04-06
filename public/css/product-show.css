@@ -1,0 +1,226 @@
+.project-detail-content {
+    color: var(--Secondary);
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.project-detail-content > *:last-child {
+    margin-bottom: 0;
+}
+
+.project-summary {
+    overflow: hidden;
+}
+
+.project-summary .project-detail-content,
+.project-summary .project-detail-content * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.project-detail-content p{
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.project-summary .project-detail-content table {
+    width: 100% !important;
+    max-width: 100%;
+    /*table-layout: fixed;*/
+    border-collapse: collapse;
+}
+
+.project-summary .project-detail-content td,
+.project-summary .project-detail-content th {
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    vertical-align: top;
+}
+
+.project-summary .project-detail-content span[style*="white-space:nowrap"] {
+    white-space: normal !important;
+}
+
+.project-detail-card {
+    padding: 32px;
+    border-radius: 24px;
+    border: 1px solid rgba(20, 24, 32, 0.08);
+    background: #fff;
+}
+
+.project-detail-list {
+    display: grid;
+    gap: 14px;
+}
+
+.project-detail-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(20, 24, 32, 0.08);
+}
+
+.project-detail-list li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.project-related-card .img-style {
+    display: block;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.project-related-card .img-style img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+}
+
+.project-gallery-thumb img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+.project-gallery-main img {
+    width: 100%;
+    height: 680px;
+    object-fit: cover;
+}
+
+.project-gallery-grid .tf-grid-layout {
+    align-items: stretch;
+}
+
+.project-gallery-featured,
+.project-gallery-secondary-item {
+    display: block;
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.project-gallery-featured img {
+    width: 100%;
+    height: 635px;
+    object-fit: cover;
+}
+
+.project-gallery-secondary {
+    display: grid;
+    gap: 20px;
+}
+
+.project-gallery-secondary .wrap-img {
+    margin-bottom: 0 !important;
+}
+
+.project-gallery-secondary-item {
+    flex: 1 1 0;
+}
+
+.project-gallery-secondary-item img {
+    width: 100%;
+    height: 308px;
+    object-fit: cover;
+}
+
+.project-gallery-panel + .project-gallery-panel {
+    margin-top: 32px;
+}
+
+.project-summary {
+    padding: 24px 28px;
+    border-radius: 24px;
+    background: rgba(246, 247, 249, 1);
+}
+
+.project-sticky-box {
+    position: sticky;
+    top: 120px;
+}
+
+.project-map-embed {
+    overflow: hidden;
+    border-radius: 24px;
+    background: rgba(246, 247, 249, 1);
+}
+
+.project-map-embed iframe {
+    display: block;
+    width: 100% !important;
+    min-height: 420px;
+    border: 0;
+}
+
+.project-detail-content .table{
+    --bs-table-color: none !important;
+    --bs-table-bg: none;
+    width: 100%;
+}
+.project-detail-content table{
+    width: 100%;
+}
+.project-detail-content *{
+    color: #000;
+}
+
+@media (max-width: 991.98px) {
+    .project-gallery-main img {
+        height: 420px;
+    }
+
+    .project-sticky-box {
+        position: static;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .project-detail-card {
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .project-gallery-main img {
+        height: 280px;
+    }
+
+    .project-gallery-thumb img {
+        height: 72px;
+        border-radius: 14px;
+    }
+
+    .project-gallery-featured,
+    .project-gallery-secondary-item {
+        border-radius: 18px;
+    }
+
+    .project-gallery-secondary {
+        gap: 12px;
+    }
+
+    .project-gallery-secondary .wrap-img {
+        gap: 12px !important;
+    }
+
+    .project-gallery-secondary-item img {
+        height: 160px;
+    }
+
+    .project-gallery-panel + .project-gallery-panel {
+        margin-top: 24px;
+    }
+
+    .project-map-embed {
+        border-radius: 18px;
+    }
+
+    .project-map-embed iframe {
+        min-height: 300px;
+    }
+}
