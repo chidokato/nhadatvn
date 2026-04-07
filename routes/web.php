@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\AdminController;
+use App\Http\Controllers\Backend\ApartmentController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\ContentController;
 use App\Http\Controllers\Backend\MenuController;
@@ -75,6 +76,10 @@ Route::prefix('admin')->name('backend.')->group(function () {
             Route::delete('{post}', [ContentController::class, 'newsDestroy'])->name('destroy');
             Route::patch('{post}/toggle-status', [ContentController::class, 'newsToggleStatus'])->name('toggle-status');
         });
+
+        Route::resource('apartments', ApartmentController::class)
+            ->except(['show'])
+            ->names('apartments');
 
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [SettingController::class, 'edit'])->name('edit');

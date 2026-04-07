@@ -69,6 +69,9 @@
                                 </td>
                                 <td>{{ $post->published_at ? $post->published_at->format('d/m/Y H:i') : '-' }}</td>
                                 <td class="text-end">
+                                    @if ($type === 'product')
+                                        <a href="{{ route('backend.apartments.index', ['project_id' => $post->id]) }}" class="btn btn-sm btn-soft-info">Can ho</a>
+                                    @endif
                                     <a href="{{ route($type === 'product' ? 'backend.products.edit' : 'backend.news.edit', $post) }}" class="btn btn-sm btn-soft-warning">Sua</a>
                                     <form action="{{ route($type === 'product' ? 'backend.products.destroy' : 'backend.news.destroy', $post) }}" method="POST" class="d-inline" data-confirm-delete data-confirm-message="Ban co chac muon xoa {{ strtolower($typeLabel) }} nay?">
                                         @csrf

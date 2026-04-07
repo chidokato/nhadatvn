@@ -92,6 +92,11 @@ class Post extends Model
         return $relation;
     }
 
+    public function apartments()
+    {
+        return $this->hasMany(Apartment::class, 'project_id')->latest();
+    }
+
     public function getFrontendUrlAttribute(): string
     {
         if ($this->category?->slug) {
