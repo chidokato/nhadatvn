@@ -18,6 +18,14 @@ class Setting extends Model
         'logo',
         'footer_logo',
         'favicon',
+        'footer_column_1_title',
+        'footer_column_1_content',
+        'footer_column_2_title',
+        'footer_column_2_content',
+        'footer_column_3_title',
+        'footer_column_3_content',
+        'footer_column_4_title',
+        'footer_column_4_content',
     ];
 
     protected $casts = [

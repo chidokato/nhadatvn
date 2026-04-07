@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\AdminController;
+use App\Http\Controllers\Backend\AdministrativeUnitController;
 use App\Http\Controllers\Backend\ApartmentController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\ContentController;
@@ -80,6 +81,11 @@ Route::prefix('admin')->name('backend.')->group(function () {
         Route::resource('apartments', ApartmentController::class)
             ->except(['show'])
             ->names('apartments');
+
+        Route::prefix('administrative-units')->name('administrative-units.')->group(function () {
+            Route::get('provinces', [AdministrativeUnitController::class, 'provinces'])->name('provinces');
+            Route::get('wards', [AdministrativeUnitController::class, 'wards'])->name('wards');
+        });
 
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [SettingController::class, 'edit'])->name('edit');

@@ -4,6 +4,14 @@
 @section('page_title', 'Sua ' . $typeLabel)
 @section('breadcrumb', 'Sua ' . $typeLabel)
 
+@push('styles')
+    <link href="{{ asset('admin-assets/css/backend-content-form.css') }}" rel="stylesheet" type="text/css" />
+@endpush
+
+@push('scripts')
+    <script src="{{ asset('admin-assets/js/backend-content-form.js') }}"></script>
+@endpush
+
 @section('content')
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">

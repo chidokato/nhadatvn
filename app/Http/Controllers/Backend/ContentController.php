@@ -7,7 +7,9 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostFloorPlan;
 use App\Models\PostImage;
+use App\Models\Province;
 use App\Models\User;
+use App\Models\Ward;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -134,11 +136,16 @@ class ContentController extends Controller
 
     protected function createByType(string $type)
     {
+        $selectedProvinceId = (int) old('province_id', 0) ?: null;
+
         return view('backend.contents.create', [
             'type' => $type,
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
             'sellerOptions' => $this->sellerOptions(),
+            'provinceOptions' => $this->provinceOptions(),
+            'wardOptions' => $this->wardOptionsForProvince($selectedProvinceId),
+            'wardMap' => $this->wardMap(),
             'galleryImages' => collect(),
             'floorPlans' => $this->supportsFloorPlans() ? collect() : collect(),
         ]);
@@ -161,12 +168,17 @@ class ContentController extends Controller
     {
         abort_unless($post->type === $type, 404);
 
+        $selectedProvinceId = (int) old('province_id', $post->province_id) ?: null;
+
         return view('backend.contents.edit', [
             'post' => $post,
             'type' => $type,
             'typeLabel' => Post::types()[$type],
             'categories' => $this->categoryOptions($type),
             'sellerOptions' => $this->sellerOptions(),
+            'provinceOptions' => $this->provinceOptions(),
+            'wardOptions' => $this->wardOptionsForProvince($selectedProvinceId),
+            'wardMap' => $this->wardMap(),
             'galleryImages' => $post->galleryImages,
             'floorPlans' => $this->supportsFloorPlans() ? $post->floorPlans : collect(),
         ]);
@@ -198,6 +210,7 @@ class ContentController extends Controller
         abort_unless($post->type === $type, 404);
 
         $this->deleteImageIfExists($post->image);
+        $this->deleteImageIfExists($post->location_image);
         foreach ($post->galleryImages as $image) {
             $this->deleteImageIfExists($image->image);
         }
@@ -250,9 +263,20 @@ class ContentController extends Controller
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string'],
             'summary' => ['nullable', 'string'],
+            'sales_policy' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string'] : ['nullable'],
             'content' => ['nullable', 'string'],
             'address' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string', 'max:255'] : ['nullable'],
+            'province_id' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'integer', Rule::exists('provinces', 'id')]
+                : ['nullable'],
+            'ward_id' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'integer', Rule::exists('wards', 'id')]
+                : ['nullable'],
             'map_embed' => $type === Post::TYPE_PRODUCT ? ['nullable', 'string'] : ['nullable'],
+            'location_image_file' => $type === Post::TYPE_PRODUCT
+                ? ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048']
+                : ['nullable'],
+            'remove_location_image' => ['nullable'],
             'area_from' => $type === Post::TYPE_PRODUCT ? ['nullable', 'numeric', 'min:0'] : ['nullable'],
             'area_to' => $type === Post::TYPE_PRODUCT ? ['nullable', 'numeric', 'min:0'] : ['nullable'],
             'floor_count_from' => $type === Post::TYPE_PRODUCT ? ['nullable', 'integer', 'min:0'] : ['nullable'],
@@ -305,6 +329,26 @@ class ContentController extends Controller
             ]);
         }
 
+        if ($this->containsInlineBase64Image($validated['sales_policy'] ?? null)) {
+            throw ValidationException::withMessages([
+                'sales_policy' => 'Chinh sach ban hang dang chua anh base64. Vui long upload anh thanh file truoc khi luu.',
+            ]);
+        }
+
+        if (
+            $type === Post::TYPE_PRODUCT
+            && ! empty($validated['province_id'])
+            && ! empty($validated['ward_id'])
+            && ! Ward::query()
+                ->whereKey($validated['ward_id'])
+                ->where('province_id', $validated['province_id'])
+                ->exists()
+        ) {
+            throw ValidationException::withMessages([
+                'ward_id' => 'Phuong xa khong thuoc tinh thanh da chon.',
+            ]);
+        }
+
         $this->validateRangeFields($validated, $type);
         $this->validateFloorPlans($request, $validated, $type);
 
@@ -314,6 +358,7 @@ class ContentController extends Controller
     protected function payload(Request $request, array $validated, string $type, ?Post $post = null): array
     {
         $imagePath = $post->image ?? null;
+        $locationImagePath = $post->location_image ?? null;
 
         if ($request->boolean('remove_image') && $imagePath) {
             $this->deleteImageIfExists($imagePath);
@@ -326,6 +371,19 @@ class ContentController extends Controller
             }
 
             $imagePath = $this->storeImage($request->file('image_file'));
+        }
+
+        if ($type === Post::TYPE_PRODUCT && $request->boolean('remove_location_image') && $locationImagePath) {
+            $this->deleteImageIfExists($locationImagePath);
+            $locationImagePath = null;
+        }
+
+        if ($type === Post::TYPE_PRODUCT && $request->hasFile('location_image_file')) {
+            if ($locationImagePath) {
+                $this->deleteImageIfExists($locationImagePath);
+            }
+
+            $locationImagePath = $this->storeImage($request->file('location_image_file'));
         }
 
         $price = null;
@@ -344,9 +402,13 @@ class ContentController extends Controller
             'seo_title' => $validated['seo_title'] ?? null,
             'seo_description' => $validated['seo_description'] ?? null,
             'summary' => $validated['summary'] ?? null,
+            'sales_policy' => $type === Post::TYPE_PRODUCT ? ($validated['sales_policy'] ?? null) : null,
             'content' => $validated['content'] ?? null,
             'address' => $type === Post::TYPE_PRODUCT ? ($validated['address'] ?? null) : null,
+            'province_id' => $type === Post::TYPE_PRODUCT ? ($validated['province_id'] ?? null) : null,
+            'ward_id' => $type === Post::TYPE_PRODUCT ? ($validated['ward_id'] ?? null) : null,
             'map_embed' => $type === Post::TYPE_PRODUCT ? ($validated['map_embed'] ?? null) : null,
+            'location_image' => $type === Post::TYPE_PRODUCT ? $locationImagePath : null,
             'area' => null,
             'area_from' => $type === Post::TYPE_PRODUCT ? ($validated['area_from'] ?? null) : null,
             'area_to' => $type === Post::TYPE_PRODUCT ? ($validated['area_to'] ?? null) : null,
@@ -378,6 +440,43 @@ class ContentController extends Controller
             ->orderBy('sort_order')
             ->orderBy('name')
             ->pluck('name', 'id');
+    }
+
+    protected function provinceOptions()
+    {
+        return Province::query()
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    protected function wardOptionsForProvince(?int $provinceId)
+    {
+        if (! $provinceId) {
+            return collect();
+        }
+
+        return Ward::query()
+            ->where('province_id', $provinceId)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+    }
+
+    protected function wardMap(): array
+    {
+        return Ward::query()
+            ->orderBy('province_id')
+            ->orderBy('name')
+            ->get(['id', 'province_id', 'name'])
+            ->groupBy('province_id')
+            ->map(function ($wards) {
+                return $wards->map(function (Ward $ward) {
+                    return [
+                        'id' => $ward->id,
+                        'name' => $ward->name,
+                    ];
+                })->values()->all();
+            })
+            ->toArray();
     }
 
     protected function sellerOptions()

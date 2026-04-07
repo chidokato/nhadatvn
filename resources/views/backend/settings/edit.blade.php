@@ -4,6 +4,10 @@
 @section('page_title', 'Setting')
 @section('breadcrumb', 'Setting')
 
+@push('scripts')
+    <script src="{{ asset('admin-assets/js/backend-settings.js') }}"></script>
+@endpush
+
 @php
     $socialMap = collect($setting->social ?? [])->mapWithKeys(function ($item) {
         return [strtolower($item['label'] ?? '') => $item['url'] ?? ''];
@@ -126,65 +130,47 @@
                 </div>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Footer 4 cot</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    @for ($column = 1; $column <= 4; $column++)
+                        <div class="col-lg-6">
+                            <div class="border rounded p-3 h-100">
+                                <div class="mb-3">
+                                    <label for="footer_column_{{ $column }}_title" class="form-label">Tieu de cot {{ $column }}</label>
+                                    <input
+                                        type="text"
+                                        id="footer_column_{{ $column }}_title"
+                                        name="footer_column_{{ $column }}_title"
+                                        class="form-control @error('footer_column_' . $column . '_title') is-invalid @enderror"
+                                        value="{{ old('footer_column_' . $column . '_title', data_get($setting, 'footer_column_' . $column . '_title')) }}"
+                                    >
+                                    @error('footer_column_' . $column . '_title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-0">
+                                    <label for="footer_column_{{ $column }}_content" class="form-label">Noi dung cot {{ $column }}</label>
+                                    <textarea
+                                        id="footer_column_{{ $column }}_content"
+                                        name="footer_column_{{ $column }}_content"
+                                        rows="6"
+                                        class="form-control editor @error('footer_column_' . $column . '_content') is-invalid @enderror"
+                                    >{{ old('footer_column_' . $column . '_content', data_get($setting, 'footer_column_' . $column . '_content')) }}</textarea>
+                                    @error('footer_column_' . $column . '_content')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+        </div>
     </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.image-upload-trigger').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var inputId = button.getAttribute('data-input');
-                    var input = document.getElementById(inputId);
-
-                    if (input) {
-                        input.click();
-                    }
-                });
-            });
-
-            document.querySelectorAll('input[type="file"]').forEach(function (input) {
-                input.addEventListener('change', function (event) {
-                    var file = event.target.files[0];
-                    var trigger = document.querySelector('.image-upload-trigger[data-input="' + input.id + '"]');
-                    var removeButton = document.querySelector('.image-remove-trigger[data-input="' + input.id + '"]');
-
-                    if (!file || !trigger) {
-                        return;
-                    }
-
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        trigger.innerHTML = '<img src="' + e.target.result + '" class="w-100 h-100 object-fit-contain" alt="preview">';
-                        if (removeButton) {
-                            removeButton.classList.remove('d-none');
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
-
-            document.querySelectorAll('.image-remove-trigger').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var inputId = button.getAttribute('data-input');
-                    var removeFieldId = button.getAttribute('data-remove');
-                    var input = document.getElementById(inputId);
-                    var removeField = document.getElementById(removeFieldId);
-                    var trigger = document.querySelector('.image-upload-trigger[data-input="' + inputId + '"]');
-
-                    if (input) {
-                        input.value = '';
-                    }
-
-                    if (removeField) {
-                        removeField.value = '1';
-                    }
-
-                    if (trigger) {
-                        trigger.innerHTML = '<div class="text-center text-muted"><div class="display-6 mb-2"><i class="ri-image-line"></i></div><div>No image</div></div>';
-                    }
-
-                    button.classList.add('d-none');
-                });
-            });
-        });
-    </script>
 @endsection

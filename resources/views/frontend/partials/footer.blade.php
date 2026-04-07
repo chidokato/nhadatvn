@@ -1,73 +1,66 @@
 @php
     $frontendBase = rtrim(request()->getSchemeAndHttpHost() . request()->getBaseUrl(), '/');
     $footerLogo = $settings && $settings->footer_logo ? $frontendBase . '/' . ltrim($settings->footer_logo, '/') : $frontendBase . '/images/logo/logo-2.svg';
-    $socials = is_array($settings->social ?? null) ? $settings->social : [];
+    $footerColumns = collect([
+        [
+            'title' => $settings->footer_column_1_title ?? null,
+            'content' => $settings->footer_column_1_content ?? null,
+        ],
+        [
+            'title' => $settings->footer_column_2_title ?? null,
+            'content' => $settings->footer_column_2_content ?? null,
+        ],
+        [
+            'title' => $settings->footer_column_3_title ?? null,
+            'content' => $settings->footer_column_3_content ?? null,
+        ],
+        [
+            'title' => $settings->footer_column_4_title ?? null,
+            'content' => $settings->footer_column_4_content ?? null,
+        ],
+    ])->map(function ($column, $index) use ($footerLogo, $settings) {
+        if (! filled($column['content'])) {
+            $defaults = [
+                0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p><p class="mb_4 text_color-1">Dia chi:</p><p class="text_white">' . e($settings->address ?? 'Dang cap nhat dia chi') . '</p><p class="text-body-default text_secondary-color mb_16"><span class="text_color-1">Hotline:</span><span class="text_white ms_4">' . e($settings->hotline ?? 'Dang cap nhat') . '</span></p><p class="text-body-default text_secondary-color"><span class="text_color-1">Email:</span><span class="text_white ms_4">' . e($settings->email ?? 'Dang cap nhat') . '</span></p>',
+                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chu</a></li><li><a href="' . e(route('frontend.about')) . '">Gioi thieu</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tuc</a></li><li><a href="' . e(route('frontend.contact')) . '">Lien he</a></li></ul>',
+                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Gioi thieu</a></li><li><a href="' . e(route('frontend.home')) . '">Du an</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tuc</a></li><li><a href="' . e(route('frontend.contact')) . '">Lien he</a></li></ul>',
+                3 => '<p>Theo doi thong tin moi nhat tu NhaDatVN.</p>',
+            ];
+
+            $column['content'] = $defaults[$index] ?? '';
+        }
+
+        if (! filled($column['title'])) {
+            $defaultTitles = [
+                0 => '',
+                1 => 'Danh muc',
+                2 => 'Menu nhanh',
+                3 => 'Ket noi voi chung toi',
+            ];
+
+            $column['title'] = $defaultTitles[$index] ?? '';
+        }
+
+        return $column;
+    });
 @endphp
 
 <footer class="footer">
     <div class="tf-container">
         <div class="footer-body">
             <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-about footer-item">
-                        <a href="{{ route('frontend.home') }}" class="footer-logo mb_17">
-                            <img src="{{ $footerLogo }}" alt="logo" class="main-logo">
-                        </a>
-                        <div class="mb_16">
-                            <p class="mb_4 text_color-1">Dia chi:</p>
-                            <p class="text_white">{{ $settings->address ?? 'Dang cap nhat dia chi' }}</p>
-                        </div>
-                        <div class="text-body-default text_secondary-color mb_16">
-                            <span class="text_color-1">Hotline:</span>
-                            <span class="text_white ms_4">{{ $settings->hotline ?? 'Dang cap nhat' }}</span>
-                        </div>
-                        <div class="text-body-default text_secondary-color">
-                            <span class="text_color-1">Email:</span>
-                            <a href="mailto:{{ $settings->email ?? '' }}" class="text_white link ms_4">{{ $settings->email ?? 'Dang cap nhat' }}</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-content footer-item d-flex justify-content-between">
-                        <div class="footer-col-block company">
-                            <div class="footer-heading footer-heading-mobile text-title fw-6 text_white mb_16">Danh muc</div>
-                            <div class="tf-collapse-content">
-                                <ul class="footer-menu-list d-grid gap_12">
-                                    <li class="text-body-default text_color-1"><a href="{{ route('frontend.home') }}" class="link">Trang chu</a></li>
-                                    <li class="text-body-default text_color-1"><a href="{{ route('frontend.about') }}" class="link">Gioi thieu</a></li>
-                                    <li class="text-body-default text_color-1"><a href="{{ route('frontend.news.index') }}" class="link">Tin tuc</a></li>
-                                    <li class="text-body-default text_color-1"><a href="{{ route('frontend.contact') }}" class="link">Lien he</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="footer-col-block quick-link">
-                            <div class="footer-heading footer-heading-mobile text-title fw-6 text_white mb_16">Menu nhanh</div>
-                            <div class="tf-collapse-content">
-                                <ul class="footer-menu-list d-grid gap_12">
-                                    @foreach (($menuTree ?? collect())->take(5) as $menu)
-                                        <li class="text-body-default text_color-1">
-                                            <a href="{{ $menu->resolved_url }}" class="link" @if($menu->target === '_blank') target="_blank" rel="noopener noreferrer" @endif>{{ $menu->name }}</a>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                @foreach ($footerColumns as $column)
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-item footer-editor-column">
+                            @if (filled($column['title']))
+                                <div class="footer-heading text-title fw-6 text_white mb_16">{{ $column['title'] }}</div>
+                            @endif
+                            <div class="footer-editor-content text_color-1">
+                                {!! $column['content'] !!}
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="footer-newsletter footer-item">
-                        <div class="footer-heading text-title fw-6 text_white mb_16">Ket noi voi chung toi</div>
-                        <p class="text_color-1 mb_20">Theo doi thong tin moi nhat tu NhaDatVN.</p>
-                        <ul class="social d-flex gap_24">
-                            @if (!empty($socials['facebook']))
-                                <li><a href="{{ $socials['facebook'] }}" class="icon-FacebookLogo" target="_blank" rel="noopener noreferrer"></a></li>
-                            @endif
-                            @if (!empty($socials['youtube']))
-                                <li><a href="{{ $socials['youtube'] }}" class="icon-YoutubeLogo" target="_blank" rel="noopener noreferrer"></a></li>
-                            @endif
-                        </ul>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
         <div class="footer-bottom d-flex align-items-center justify-content-between">

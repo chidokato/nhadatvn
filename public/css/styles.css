@@ -2853,6 +2853,9 @@ a:focus, a:hover {
     padding-top: 13px;
     padding-left: 12px;
   }
+  .footer .footer-editor-column {
+    margin-bottom: 24px;
+  }
   .footer .footer-heading-mobile {
     display: block;
     position: relative;
@@ -2904,6 +2907,39 @@ a:focus, a:hover {
     flex-direction: column;
     gap: 12px;
   }
+}
+.footer .footer-editor-logo {
+  max-width: 220px;
+  height: auto;
+}
+.footer .footer-editor-content,
+.footer .footer-editor-content p,
+.footer .footer-editor-content li,
+.footer .footer-editor-content span,
+.footer .footer-editor-content div {
+  color: #a8b1c1;
+}
+.footer .footer-editor-content a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.footer .footer-editor-content a:hover {
+  color: var(--primary);
+}
+.footer .footer-editor-content ul,
+.footer .footer-editor-content ol {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 12px;
+}
+.footer .footer-editor-content img {
+  max-width: 100%;
+  height: auto;
+}
+.footer .footer-editor-content > *:last-child {
+  margin-bottom: 0;
 }
 
 /*------------ tabs ---------------- */

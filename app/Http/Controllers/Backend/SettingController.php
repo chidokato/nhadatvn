@@ -34,6 +34,14 @@ class SettingController extends Controller
             'remove_logo' => ['nullable'],
             'remove_footer_logo' => ['nullable'],
             'remove_favicon' => ['nullable'],
+            'footer_column_1_title' => ['nullable', 'string', 'max:255'],
+            'footer_column_1_content' => ['nullable', 'string'],
+            'footer_column_2_title' => ['nullable', 'string', 'max:255'],
+            'footer_column_2_content' => ['nullable', 'string'],
+            'footer_column_3_title' => ['nullable', 'string', 'max:255'],
+            'footer_column_3_content' => ['nullable', 'string'],
+            'footer_column_4_title' => ['nullable', 'string', 'max:255'],
+            'footer_column_4_content' => ['nullable', 'string'],
         ]);
 
         $social = $this->buildSocial($validated);
@@ -47,6 +55,14 @@ class SettingController extends Controller
             'logo' => $this->syncImage($request, $setting->logo, 'logo_file', 'remove_logo'),
             'footer_logo' => $this->syncImage($request, $setting->footer_logo, 'footer_logo_file', 'remove_footer_logo'),
             'favicon' => $this->syncImage($request, $setting->favicon, 'favicon_file', 'remove_favicon'),
+            'footer_column_1_title' => $validated['footer_column_1_title'] ?? null,
+            'footer_column_1_content' => $validated['footer_column_1_content'] ?? null,
+            'footer_column_2_title' => $validated['footer_column_2_title'] ?? null,
+            'footer_column_2_content' => $validated['footer_column_2_content'] ?? null,
+            'footer_column_3_title' => $validated['footer_column_3_title'] ?? null,
+            'footer_column_3_content' => $validated['footer_column_3_content'] ?? null,
+            'footer_column_4_title' => $validated['footer_column_4_title'] ?? null,
+            'footer_column_4_content' => $validated['footer_column_4_content'] ?? null,
         ]);
 
         return redirect()

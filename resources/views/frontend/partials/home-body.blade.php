@@ -51,6 +51,7 @@
     $latestNewsItems = ($latestNews ?? collect())->take(3)->values();
     $latestNewsImage = static fn ($post, $fallback) => asset(ltrim(($post->image ?: $fallback), '/'));
     $latestNewsDate = static fn ($post) => optional($post->published_at)->format('M d, Y') ?: 'Dang cap nhat';
+    $locationProjects = ($latestProducts ?? collect())->take(4)->values();
 @endphp
 
 <!-- page-title -->
@@ -208,70 +209,66 @@
             </div>
             <!-- End section-features-property -->
 
-            <!-- section-why -->
-            <div class="section-why-1 tf-spacing-1">
-                <div class="tf-container">
-                    <div class="box-why">
-                        <div class="tf-grid-layout lg-col-2 align-items-center">
-                            <div class="thumbs tf-animate-1">
-                                <img loading="lazy" decoding="async" src="images/section/section-why.jpg" width="610"
-                                    height="813" alt="section-why">
-                                <div class="text-center item tf-animate-2 scroll-tranform" data-distance="20%">
-                                    <div class="h1 mb_6">16</div>
-                                    <h5>Years Of Experience</h5>
-                                </div>
+            <!-- section-location -->
+            <div class="section-location-3 sw-layout tf-spacing-1">
+                <div class="tf-container w-1830">
+                    <div class="heading-section justify-content-center text-center mb_46">
+                        <span class="sub text-uppercase fw-6 text_secondary-color-2 split-text effect-rotate">Khu vực dự án</span>
+                        <h3 class="split-text effect-blur-fade">Vị trí nổi bật</h3>
+                    </div>
+                    <div class="position-relative">
+                        <div class="swiper scrolling-effect effectLeft" data-preview="4" data-tablet="2"
+                            data-mobile-sm="2" data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15">
+                            <div class="swiper-wrapper">
+                                @forelse ($locationProjects as $index => $product)
+                                    @php
+                                        $locationFallback = 'images/section/location-' . (7 + $index) . '.jpg';
+                                        $locationImage = $latestHomeImage($product->image, $locationFallback);
+                                        $locationLabel = $product->address ?: ($product->category->name ?? 'Đang cập nhật');
+                                        $locationCount = filled($product->unit_count_to)
+                                            ? $product->unit_count_to . ' căn'
+                                            : (filled($product->unit_count_from) ? 'Từ ' . $product->unit_count_from . ' căn' : 'Dự án nổi bật');
+                                    @endphp
+                                    <div class="swiper-slide">
+                                        <div class="location-item style-1 hover-image">
+                                            <a href="{{ $product->frontend_url }}" class="img-style">
+                                                <img loading="lazy" decoding="async" width="428" height="590"
+                                                    src="{{ $locationImage }}" alt="{{ $product->title }}">
+                                            </a>
+                                            <div class="content">
+                                                <a href="{{ $product->frontend_url }}" class="mb_8 h5 text_primary-color">{{ $locationLabel }}</a>
+                                                <p class="text-caption-1">{{ $locationCount }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="swiper-slide">
+                                        <div class="location-item style-1 hover-image">
+                                            <a href="#" class="img-style">
+                                                <img loading="lazy" decoding="async" width="428" height="590"
+                                                    src="images/section/location-7.jpg" alt="location">
+                                            </a>
+                                            <div class="content">
+                                                <span class="mb_8 h5 text_primary-color d-block">Đang cập nhật</span>
+                                                <p class="text-caption-1">Chưa có dữ liệu</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforelse
                             </div>
-                            <div class="content-inner">
-                                <div class="heading-section mb_48">
-                                    <span class="sub text-uppercase fw-6 split-text effect-rotate">Why CHoose Us</span>
-                                    <h3 class="split-text effect-blur-fade">Experience The Difference With Our Solutions
-                                    </h3>
-                                </div>
-                                <div class="wrap-icon">
-                                    <div class="tf-box-icon style-2 v2 effect-icon scrolling-effect effectLeft ">
-                                        <div class="icon"><i class="icon-Lifebuoy"></i></div>
-                                        <div class="content">
-                                            <h5 class="mb_8">Personalized Support</h5>
-                                            <p class="text_secondary-color-2">Receive tailored assistance from our
-                                                experienced team
-                                                to ensure every step fits your specific needs and goals.</p>
-                                        </div>
-                                    </div>
-                                    <div class="tf-box-icon style-2 v2 effect-icon scrolling-effect effectLeft ">
-                                        <div class="icon"><i class="icon-ClockCountdown
-                                            "></i></div>
-                                        <div class="content">
-                                            <h5 class="mb_8">Time-Saving Process</h5>
-                                            <p class="text_secondary-color-2">From quick callbacks to streamlined
-                                                procedures, we value your time and help you move forward without delays.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="tf-box-icon style-2 v2 effect-icon scrolling-effect effectLeft ">
-                                        <div class="icon"><i class="icon-SketchLogo"></i></div>
-                                        <div class="content">
-                                            <h5 class="mb_8">Trusted Expertise</h5>
-                                            <p class="text_secondary-color-2">Work with professionals who bring deep
-                                                industry knowledge and proven strategies to guide your decisions
-                                                confidently.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="about-us.html" class="tf-btn btn-bg-1 btn-px-32 scrolling-effect effectBottom">
-                                    <span>About Us</span>
-                                    <span class="bg-effect"></span>
-                                </a>
+                            <div class="sw-dots style-1 sw-pagination-layout text-center mt_24 d-xl-none">
                             </div>
+                        </div>
+                        <div class="sw-button nav-prev-layout xl-hide">
+                            <i class="icon-CaretLeft"></i>
+                        </div>
+                        <div class="sw-button nav-next-layout xl-hide">
+                            <i class="icon-CaretRight"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- End section-why -->
-
-            
-
-            
-
+            <!-- End section-location -->
 
             <!-- section-categories -->
             <div class="sw-layout bg-dark-color tf-spacing-1">

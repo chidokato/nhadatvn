@@ -22,9 +22,13 @@ class Post extends Model
         'seo_title',
         'seo_description',
         'summary',
+        'sales_policy',
         'content',
         'address',
+        'province_id',
+        'ward_id',
         'map_embed',
+        'location_image',
         'area',
         'area_from',
         'area_to',
@@ -73,6 +77,16 @@ class Post extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
     }
 
     public function galleryImages()

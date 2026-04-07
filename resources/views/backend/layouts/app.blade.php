@@ -13,81 +13,8 @@
     <link href="{{ asset('admin-assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('admin-assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('admin-assets/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
-    <style>
-        .app-search .form-control {
-            min-width: 240px;
-        }
-
-        .status-toggle {
-            position: relative;
-            width: 42px;
-            height: 22px;
-            border: 0;
-            border-radius: 999px;
-            transition: all 0.2s ease;
-        }
-
-        .status-toggle::before {
-            content: "";
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #fff;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
-        }
-
-        .status-toggle.is-active {
-            background: #10b981;
-        }
-
-        .status-toggle.is-inactive {
-            background: #f06548;
-        }
-
-        .status-toggle.is-active::before {
-            transform: translateX(20px);
-        }
-
-        .status-toggle:disabled {
-            opacity: 0.6;
-            cursor: wait;
-        }
-
-        .status-toggle-label {
-            min-width: 44px;
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .sort-order-input {
-            width: 58px;
-            min-width: 58px;
-            padding-left: 8px;
-            padding-right: 8px;
-            text-align: center;
-        }
-
-        .ck-editor__editable_inline {
-            min-height: 320px;
-        }
-
-        .ck-editor__editable_inline .ck-content p,
-        .ck.ck-editor__editable_inline p {
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
-
-        .ck-editor__editable_inline .ck-content p:last-child,
-        .ck.ck-editor__editable_inline p:last-child {
-            margin-bottom: 0;
-        }
-    </style>
+    <link href="{{ asset('admin-assets/css/backend-admin.css') }}" rel="stylesheet" type="text/css" />
+    @stack('styles')
 </head>
 <body>
     <div id="layout-wrapper">
@@ -208,6 +135,8 @@
                                 ['label' => 'Category', 'icon' => 'ri-list-check-2', 'route' => 'backend.categories.index'],
                                 ['label' => 'Product', 'icon' => 'ri-shopping-bag-3-line', 'route' => 'backend.products.index'],
                                 ['label' => 'Apartment', 'icon' => 'ri-building-4-line', 'route' => 'backend.apartments.index'],
+                                ['label' => 'Tinh thanh', 'icon' => 'ri-road-map-line', 'route' => 'backend.administrative-units.provinces'],
+                                ['label' => 'Phuong xa', 'icon' => 'ri-community-line', 'route' => 'backend.administrative-units.wards'],
                                 ['label' => 'News', 'icon' => 'ri-newspaper-line', 'route' => 'backend.news.index'],
                                 ['label' => 'Setting', 'icon' => 'ri-settings-3-line', 'route' => 'backend.settings.edit'],
                                 ['label' => 'User', 'icon' => 'ri-user-3-line', 'route' => 'backend.users.index'],
@@ -215,7 +144,7 @@
                         @endphp
                         @foreach ($menuItems as $item)
                             <li class="nav-item">
-                                <a class="nav-link menu-link {{ $item['label'] === 'Menu' && request()->routeIs('backend.menus.*') ? 'active' : '' }} {{ $item['label'] === 'User' && request()->routeIs('backend.users.*') ? 'active' : '' }} {{ $item['label'] === 'Category' && request()->routeIs('backend.categories.*') ? 'active' : '' }} {{ $item['label'] === 'Product' && request()->routeIs('backend.products.*') ? 'active' : '' }} {{ $item['label'] === 'Apartment' && request()->routeIs('backend.apartments.*') ? 'active' : '' }} {{ $item['label'] === 'News' && request()->routeIs('backend.news.*') ? 'active' : '' }} {{ $item['label'] === 'Setting' && request()->routeIs('backend.settings.*') ? 'active' : '' }}" href="{{ $item['route'] ? route($item['route']) : '#' }}">
+                                <a class="nav-link menu-link {{ $item['label'] === 'Menu' && request()->routeIs('backend.menus.*') ? 'active' : '' }} {{ $item['label'] === 'User' && request()->routeIs('backend.users.*') ? 'active' : '' }} {{ $item['label'] === 'Category' && request()->routeIs('backend.categories.*') ? 'active' : '' }} {{ $item['label'] === 'Product' && request()->routeIs('backend.products.*') ? 'active' : '' }} {{ $item['label'] === 'Apartment' && request()->routeIs('backend.apartments.*') ? 'active' : '' }} {{ $item['label'] === 'Tinh thanh' && request()->routeIs('backend.administrative-units.provinces') ? 'active' : '' }} {{ $item['label'] === 'Phuong xa' && request()->routeIs('backend.administrative-units.wards') ? 'active' : '' }} {{ $item['label'] === 'News' && request()->routeIs('backend.news.*') ? 'active' : '' }} {{ $item['label'] === 'Setting' && request()->routeIs('backend.settings.*') ? 'active' : '' }}" href="{{ $item['route'] ? route($item['route']) : '#' }}">
                                     <i class="{{ $item['icon'] }}"></i>
                                     <span>{{ $item['label'] }}</span>
                                 </a>
@@ -271,6 +200,15 @@
         @csrf
     </form>
 
+    <div
+        id="backend-app-config"
+        class="d-none"
+        data-upload-url="{{ route('backend.admin.uploads.editor-image') }}"
+        data-success-message="{{ session('success', '') }}"
+        data-error-message="{{ session('error', '') }}"
+        data-validation-message="{{ $errors->any() ? collect($errors->all())->implode(' | ') : '' }}"
+    ></div>
+
     <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
         <i class="ri-arrow-up-line"></i>
     </button>
@@ -284,173 +222,7 @@
     <script src="{{ asset('admin-assets/js/customc-keditor.js') }}"></script>
     <script src="{{ asset('admin-assets/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
     <script src="{{ asset('admin-assets/js/app.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            window.uploadUrl = @json(route('backend.admin.uploads.editor-image'));
-
-            function showToast(icon, title, text) {
-                Swal.fire({
-                    toast: true,
-                    position: 'bottom-start',
-                    icon: icon,
-                    title: title,
-                    text: text,
-                    timer: 2200,
-                    timerProgressBar: true,
-                    showConfirmButton: false,
-                    showCloseButton: true
-                });
-            }
-
-            @if (session('success'))
-                showToast('success', 'Thanh cong', @json(session('success')));
-            @endif
-
-            @if (session('error'))
-                showToast('error', 'Co loi xay ra', @json(session('error')));
-            @endif
-
-            @if ($errors->any())
-                showToast('warning', 'Vui long kiem tra du lieu', @json(collect($errors->all())->implode(' | ')));
-            @endif
-
-            document.querySelectorAll('[data-confirm-delete]').forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    event.preventDefault();
-
-                    var message = form.getAttribute('data-confirm-message') || 'Ban co chac muon xoa muc nay?';
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Xac nhan xoa',
-                        text: message,
-                        showCancelButton: true,
-                        confirmButtonText: 'Xoa',
-                        cancelButtonText: 'Huy',
-                        confirmButtonColor: '#f06548',
-                        cancelButtonColor: '#405189'
-                    }).then(function (result) {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
-
-            document.querySelectorAll('[data-toggle-status]').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    var url = button.getAttribute('data-url');
-                    var label = button.parentElement.querySelector('[data-status-label]');
-                    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-                    if (!url) {
-                        return;
-                    }
-
-                    button.disabled = true;
-
-                    fetch(url, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({})
-                    })
-                        .then(function (response) {
-                            if (!response.ok) {
-                                throw new Error('Toggle status failed');
-                            }
-
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            button.classList.toggle('is-active', data.is_active);
-                            button.classList.toggle('is-inactive', !data.is_active);
-                            button.setAttribute('aria-pressed', data.is_active ? 'true' : 'false');
-
-                            if (label) {
-                                label.textContent = data.label;
-                                label.classList.toggle('text-success', data.is_active);
-                                label.classList.toggle('text-danger', !data.is_active);
-                            }
-
-                            showToast('success', 'Da cap nhat', data.message);
-                        })
-                        .catch(function () {
-                            showToast('error', 'Khong cap nhat duoc', 'Vui long thu lai.');
-                        })
-                        .finally(function () {
-                            button.disabled = false;
-                        });
-                });
-            });
-
-            document.querySelectorAll('[data-update-sort-order]').forEach(function (input) {
-                var submitSortOrder = function () {
-                    var url = input.getAttribute('data-url');
-                    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    var currentValue = input.value.trim();
-                    var initialValue = input.getAttribute('data-initial-value');
-
-                    if (!url || currentValue === '' || currentValue === initialValue) {
-                        if (currentValue === '') {
-                            input.value = initialValue || 0;
-                        }
-
-                        return;
-                    }
-
-                    input.disabled = true;
-
-                    fetch(url, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            sort_order: Number(currentValue)
-                        })
-                    })
-                        .then(function (response) {
-                            if (!response.ok) {
-                                throw new Error('Update sort order failed');
-                            }
-
-                            return response.json();
-                        })
-                        .then(function (data) {
-                            input.value = data.sort_order;
-                            input.setAttribute('data-initial-value', data.sort_order);
-                            showToast('success', 'Da cap nhat', data.message);
-                        })
-                        .catch(function () {
-                            input.value = initialValue || 0;
-                            showToast('error', 'Khong cap nhat duoc', 'Vui long thu lai.');
-                        })
-                        .finally(function () {
-                            input.disabled = false;
-                        });
-                };
-
-                input.addEventListener('blur', submitSortOrder);
-                input.addEventListener('keydown', function (event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        input.blur();
-                    }
-                });
-            });
-
-            if (typeof initEditor === 'function') {
-                initEditor();
-            }
-        });
-    </script>
+    <script src="{{ asset('admin-assets/js/backend-admin.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>
