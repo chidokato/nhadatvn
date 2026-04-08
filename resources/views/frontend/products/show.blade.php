@@ -124,11 +124,11 @@
             }
 
             if ($fromValue) {
-                return 'Tu ' . $fromValue . $suffix;
+                return 'Từ ' . $fromValue . $suffix;
             }
 
             if ($toValue) {
-                return 'Den ' . $toValue . $suffix;
+                return 'Đến ' . $toValue . $suffix;
             }
 
             return null;
@@ -435,8 +435,8 @@
                         <div id="can-ho" class="section tf-spacing-9 pt-0">
                             <div class="project-apartment-showcase">
                                 <div class="project-apartment-showcase-heading text-center">
-                                    <div class="text-uppercase project-apartment-showcase-kicker">Can h?</div>
-                                    <h3>C� th? b?n dang t�m ki?m ?</h3>
+                                    <div class="text-uppercase project-apartment-showcase-kicker">Căn hộ</div>
+                                    <h3>Có thể bạn đang tìm kiếm?</h3>
                                 </div>
                                 @if ($apartments->isNotEmpty())
                                     <div class="project-apartment-showcase-grid">
@@ -449,7 +449,7 @@
                                                     ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $apartment->content))), 72)
                                                     : null;
                                                 $apartmentSubtitle = $apartmentArea
-                                                    ?: (filled($apartment->bedroom_count) ? $apartment->bedroom_count . ' ph�ng ng?' : 'Xem chi ti?t');
+                                                    ?: (filled($apartment->bedroom_count) ? $apartment->bedroom_count . ' phòng ngủ' : 'Xem chi tiết');
                                             @endphp
                                             <div class="project-apartment-showcase-card">
                                                 <div class="project-apartment-showcase-image">
@@ -466,7 +466,7 @@
                                         @endforeach
                                     </div>
                                 @else
-                                    <p class="mb-0 text-white-50 text-center">Danh s�ch can h? dang du?c c?p nh?t.</p>
+                                    <p class="mb-0 text-white-50 text-center">Danh sách căn hộ đang được cập nhật.</p>
                                 @endif
                             </div>
                         </div>
@@ -475,7 +475,7 @@
                     <div class="col-lg-4">
                         <div class="project-sticky-box tf-spacing-9">
                             <div class="box-sellers project-contact-box">
-                                <h5 class="project-contact-box-title">Contact Sellers</h5>
+                                <h5 class="project-contact-box-title">Liên hệ tư vấn</h5>
                                 <div class="project-contact-author">
                                     @if (filled($sellerAvatar))
                                         <div class="avatar">
@@ -502,7 +502,7 @@
                                             </span>
                                             <div class="project-contact-copy">
                                                 <p>{{ $sellerAddress }}</p>
-                                                <a href="{{ $directionsUrl }}" target="_blank" rel="noopener">Get Directions</a>
+                                                <a href="{{ $directionsUrl }}" target="_blank" rel="noopener">Xem đường đi</a>
                                             </div>
                                         </li>
                                     @endif
@@ -526,7 +526,7 @@
                                     <div class="project-contact-actions">
                                         @if ($callPhone !== '')
                                             <a href="{{ 'tel:' . $callPhone }}" class="tf-btn btn-bg-1 w-full">
-                                                <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Hotline</span>
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Gọi hotline</span>
                                                 <span class="bg-effect"></span>
                                             </a>
                                         @endif
@@ -538,7 +538,7 @@
                                         @endif
                                         @if (filled($priceListUrl))
                                             <a href="{{ $priceListHref }}" class="tf-btn btn-bg-primary-2 w-full" target="_blank" rel="noopener" download>
-                                                <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>T?i b?ng gi� d? �n</span>
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>Tải bảng giá dự án</span>
                                                 <span class="bg-effect"></span>
                                             </a>
                                         @endif
@@ -607,6 +607,7 @@
     <script src="{{ asset('js/jquery.fancybox.js') }}"></script>
     <script src="{{ asset('js/magnific-popup.min.js') }}"></script>
 @endpush
+
 
 
 
