@@ -469,8 +469,8 @@
 
 .project-contact-item {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: center;
+    gap: 14px;
 }
 
 .project-contact-icon {
@@ -487,17 +487,37 @@
     font-size: 20px;
 }
 
+.project-contact-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 42px;
+}
+
 .project-contact-copy p {
     margin-bottom: 4px;
     color: var(--Text-primary);
     line-height: 1.6;
 }
 
+.project-contact-copy p:last-child {
+    margin-bottom: 0;
+}
+
 .project-contact-copy a {
     color: var(--Text-primary);
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: none;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.5;
+    margin-top: 2px;
+}
+
+.project-contact-copy a:hover {
+    border-bottom: none;
 }
 
 .project-contact-actions {
