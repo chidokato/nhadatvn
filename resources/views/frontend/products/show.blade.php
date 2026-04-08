@@ -315,7 +315,7 @@
                                     {{ $displayText($product->address, 'Thông tin địa chỉ đang được cập nhật.') }}
                                 </p>
                                 @if ($locationImage)
-                                    <div class="project-location-image mb_20">
+                                    <div class="project-location-image">
                                         <img src="{{ $displayImage($locationImage) }}" alt="{{ $product->title }} location">
                                     </div>
                                 @endif
