@@ -324,9 +324,9 @@
                                         {!! $product->map_embed !!}
                                     </div>
                                 @else
-                                    <div class="project-summary">
+                                    <!-- <div class="project-summary">
                                         <p class="text-body-default text_secondary-color mb-0">{{ $displayText($product->address) }}</p>
-                                    </div>
+                                    </div> -->
                                 @endif
                             </div>
                         </div>
