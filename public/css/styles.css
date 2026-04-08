@@ -8026,7 +8026,8 @@ tr {
   border-radius: unset;
 }
 .box-sellers.style-1 .author .avatar img {
-  border-radius: 12px;
+  border-radius: 100%;
+  width: 50%;
 }
 .box-sellers.style-2 {
   display: flex;

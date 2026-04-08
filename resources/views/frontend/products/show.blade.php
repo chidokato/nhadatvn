@@ -68,14 +68,14 @@
         $displayImage = static fn ($path) => asset(ltrim($path, '/'));
         $displayText = static fn ($value, $fallback = 'Đang cập nhật') => filled($value) ? $value : $fallback;
         $defaultSeller = (object) [
-            'name' => 'Jorge R.',
-            'job_title' => 'Senior Property Manager',
-            'bio' => 'Jorge R. is an experienced agent known for friendly service, local expertise, reliable property guidance across and nearby areas.',
-            'address' => '6205 Peachtree Dunwoody Rd, Atlanta, GA 30328',
-            'phone' => '1-555-678-8888',
-            'secondary_phone' => '1-555-678-8888',
-            'whatsapp_phone' => '15556788888',
-            'avatar' => 'images/section/agent-2.1.jpg',
+            'name' => '',
+            'job_title' => '',
+            'bio' => '',
+            'address' => '',
+            'phone' => '',
+            'secondary_phone' => '',
+            'whatsapp_phone' => '',
+            'avatar' => '',
         ];
         $seller = $contactSeller ?? $defaultSeller;
         $sellerAddress = $displayText($seller->address ?? $defaultSeller->address);
@@ -467,7 +467,6 @@
                     <div class="col-lg-4">
                         <div class="project-sticky-box tf-spacing-9">
                             <div class="box-sellers style-1 project-contact-box">
-                                <h5 class="mb_28">Liên hệ tư vấn</h5>
                                 <div class="author mb_28">
                                     <div class="avatar mb_28">
                                         <img src="{{ $displayImage($sellerAvatar) }}" width="354" height="354" alt="{{ $displayText($seller->name ?? $defaultSeller->name) }}">
