@@ -343,6 +343,74 @@
                             </div>
                         </div>
 
+                        
+
+                        
+
+                        
+                        
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="project-sticky-box tf-spacing-9">
+                            <div class="box-sellers project-contact-box">
+                                <h5 class="project-contact-box-title">Liên hệ tư vấn</h5>
+                                <div class="project-contact-author">
+                                    @if (filled($sellerAvatar))
+                                        <div class="avatar">
+                                            <img src="{{ $displayImage($sellerAvatar) }}" width="354" height="354" alt="{{ $sellerName }}">
+                                        </div>
+                                    @endif
+                                    <div class="author-info">
+                                        @if (filled($sellerName))
+                                            <h6>{{ $sellerName }}</h6>
+                                        @endif
+                                        @if (filled($sellerPhone))
+                                            <p>{{ $sellerPhone }}</p>
+                                        @endif
+                                        @if (filled($sellerEmail))
+                                            <p>{{ $sellerEmail }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                <ul class="project-contact-list">
+                                    @if (filled($sellerAddress))
+                                        <li class="project-contact-item">
+                                            <span class="project-contact-icon">
+                                                <i class="icon-MapPin"></i>
+                                            </span>
+                                            <div class="project-contact-copy">
+                                                <p>{{ $sellerAddress }}</p>
+                                            </div>
+                                        </li>
+                                    @endif
+                                </ul>
+                                @if ($callPhone !== '' || $zaloPhone !== '' || filled($priceListUrl))
+                                    <div class="project-contact-actions">
+                                        @if ($callPhone !== '')
+                                            <a href="{{ 'tel:' . $callPhone }}" class="tf-btn btn-bg-1 w-full">
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Gọi hotline</span>
+                                                <span class="bg-effect"></span>
+                                            </a>
+                                        @endif
+                                        @if ($zaloPhone !== '')
+                                            <a href="{{ $zaloUrl }}" class="tf-btn btn-bg-primary-2 w-full" target="_blank" rel="noopener">
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-ChatCircleDots"></i>Chat Zalo</span>
+                                                <span class="bg-effect"></span>
+                                            </a>
+                                        @endif
+                                        @if (filled($priceListUrl))
+                                            <a href="{{ $priceListHref }}" class="tf-btn btn-bg-primary-2 w-full" target="_blank" rel="noopener" download>
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>Tải bảng giá dự án</span>
+                                                <span class="bg-effect"></span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mt-5">
                         <div id="tien-ich" class="section tf-spacing-9 pt-0 mb-5">
                             <div class="project-detail-card">
                                 <h5 class="properties-title mb_20">Tiện ích</h5>
@@ -377,7 +445,25 @@
                                 @endif
                             </div>
                         </div>
-
+                        <div id="mat-bang" class="section tf-spacing-9 pt-0 mb-5">
+                            <div class="project-detail-card">
+                                <h5 class="properties-title mb_20">Mặt bằng</h5>
+                                @if ($floorPlans->isNotEmpty())
+                                    <div class="project-floor-plan-grid">
+                                        @foreach ($floorPlans as $floorPlan)
+                                            <a href="{{ $displayImage($floorPlan->image) }}" data-fancybox="project-floor-plans" class="project-floor-plan-card">
+                                                <img src="{{ $displayImage($floorPlan->image) }}" alt="{{ $floorPlan->name ?: $product->title }}">
+                                                <div class="project-floor-plan-body">
+                                                    <strong>{{ $floorPlan->name ?: 'Mặt bằng dự án' }}</strong>
+                                                </div>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="mb-0 text_secondary-color">Nội dung mặt bằng đang được cập nhật.</p>
+                                @endif
+                            </div>
+                        </div>
                         <div id="noi-that" class="section tf-spacing-9 pt-0 mb-5">
                             <div class="project-detail-card">
                                 <h5 class="properties-title mb_20">Nội thất</h5>
@@ -409,26 +495,6 @@
                                     </div>
                                 @else
                                     <p class="mb-0 text_secondary-color">Nội dung nội thất đang được cập nhật.</p>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div id="mat-bang" class="section tf-spacing-9 pt-0 mb-5">
-                            <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Mặt bằng</h5>
-                                @if ($floorPlans->isNotEmpty())
-                                    <div class="project-floor-plan-grid">
-                                        @foreach ($floorPlans as $floorPlan)
-                                            <a href="{{ $displayImage($floorPlan->image) }}" data-fancybox="project-floor-plans" class="project-floor-plan-card">
-                                                <img src="{{ $displayImage($floorPlan->image) }}" alt="{{ $floorPlan->name ?: $product->title }}">
-                                                <div class="project-floor-plan-body">
-                                                    <strong>{{ $floorPlan->name ?: 'Mặt bằng dự án' }}</strong>
-                                                </div>
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <p class="mb-0 text_secondary-color">Nội dung mặt bằng đang được cập nhật.</p>
                                 @endif
                             </div>
                         </div>
@@ -470,82 +536,8 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
+                        
 
-                    <div class="col-lg-4">
-                        <div class="project-sticky-box tf-spacing-9">
-                            <div class="box-sellers project-contact-box">
-                                <h5 class="project-contact-box-title">Liên hệ tư vấn</h5>
-                                <div class="project-contact-author">
-                                    @if (filled($sellerAvatar))
-                                        <div class="avatar">
-                                            <img src="{{ $displayImage($sellerAvatar) }}" width="354" height="354" alt="{{ $sellerName }}">
-                                        </div>
-                                    @endif
-                                    <div class="author-info">
-                                        @if (filled($sellerName))
-                                            <h6>{{ $sellerName }}</h6>
-                                        @endif
-                                        @if (filled($sellerPhone))
-                                            <p>{{ $sellerPhone }}</p>
-                                        @endif
-                                        @if (filled($sellerEmail))
-                                            <p>{{ $sellerEmail }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                <ul class="project-contact-list">
-                                    @if (filled($sellerAddress))
-                                        <li class="project-contact-item">
-                                            <span class="project-contact-icon">
-                                                <i class="icon-MapPin"></i>
-                                            </span>
-                                            <div class="project-contact-copy">
-                                                <p>{{ $sellerAddress }}</p>
-                                                <a href="{{ $directionsUrl }}" target="_blank" rel="noopener">Xem đường đi</a>
-                                            </div>
-                                        </li>
-                                    @endif
-                                    @if (filled($sellerPhone) || filled($sellerSecondaryPhone))
-                                        <li class="project-contact-item">
-                                            <span class="project-contact-icon">
-                                                <i class="icon-PhoneCall"></i>
-                                            </span>
-                                            <div class="project-contact-copy">
-                                                @if (filled($sellerPhone))
-                                                    <p>{{ $sellerPhone }}</p>
-                                                @endif
-                                                @if (filled($sellerSecondaryPhone))
-                                                    <p>{{ $sellerSecondaryPhone }}</p>
-                                                @endif
-                                            </div>
-                                        </li>
-                                    @endif
-                                </ul>
-                                @if ($callPhone !== '' || $zaloPhone !== '' || filled($priceListUrl))
-                                    <div class="project-contact-actions">
-                                        @if ($callPhone !== '')
-                                            <a href="{{ 'tel:' . $callPhone }}" class="tf-btn btn-bg-1 w-full">
-                                                <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Gọi hotline</span>
-                                                <span class="bg-effect"></span>
-                                            </a>
-                                        @endif
-                                        @if ($zaloPhone !== '')
-                                            <a href="{{ $zaloUrl }}" class="tf-btn btn-bg-primary-2 w-full" target="_blank" rel="noopener">
-                                                <span class="d-flex align-items-center gap_8"><i class="icon-ChatCircleDots"></i>Chat Zalo</span>
-                                                <span class="bg-effect"></span>
-                                            </a>
-                                        @endif
-                                        @if (filled($priceListUrl))
-                                            <a href="{{ $priceListHref }}" class="tf-btn btn-bg-primary-2 w-full" target="_blank" rel="noopener" download>
-                                                <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>Tải bảng giá dự án</span>
-                                                <span class="bg-effect"></span>
-                                            </a>
-                                        @endif
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
