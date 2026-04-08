@@ -301,18 +301,6 @@
                                 </div>
                             @endif
 
-                            <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">Tổng quan dự án</h5>
-                                <div class="project-overview-grid">
-                                    @foreach ($overviewItems as $item)
-                                        <div class="project-overview-item">
-                                            <span>{{ $item['label'] }}</span>
-                                            <strong>{{ $item['value'] }}</strong>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-
                             <div class="project-detail-card mt_24">
                                 <h5 class="properties-title mb_20">Mô tả dự án</h5>
                                 <div class="project-detail-content">
