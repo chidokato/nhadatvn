@@ -641,7 +641,7 @@ h4,
 
 h5,
 .h5 {
-  font-size: 24px;
+  font-size: 2rem;
   line-height: 30px;
 }
 
@@ -4373,6 +4373,7 @@ form textarea {
 .blog-article-item .article-thumb img {
   width: 100%;
   object-fit: cover;
+      height: 250px;
 }
 .blog-article-item .tag {
   position: absolute;
@@ -6801,6 +6802,7 @@ tr {
 .card-house .img-style img {
   width: 100%;
   object-fit: cover;
+      height: 250px;
 }
 .card-house.style-default .wrap-btn {
   position: absolute;

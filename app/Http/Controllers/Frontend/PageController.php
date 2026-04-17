@@ -10,6 +10,8 @@ class PageController extends BaseFrontendController
 {
     public function productCategory(string $slug)
     {
+        $sort = (string) request()->query('sort', '');
+
         $category = Category::query()
             ->where('type', Category::TYPE_PRODUCT)
             ->where('is_active', true)
@@ -26,19 +28,34 @@ class PageController extends BaseFrontendController
         $categoryIds = $this->collectDescendantIds($allCategories, $category->id);
         $categoryTree = $this->buildCategoryTree($allCategories);
 
-        $products = Post::query()
+        $productsQuery = Post::query()
             ->with('category')
             ->where('type', Post::TYPE_PRODUCT)
             ->where('is_active', true)
-            ->whereIn('category_id', $categoryIds)
-            ->orderByDesc('published_at')
-            ->orderByDesc('id')
-            ->get();
+            ->whereIn('category_id', $categoryIds);
+
+        switch ($sort) {
+            case 'old':
+                $productsQuery
+                    ->orderBy('published_at')
+                    ->orderBy('id');
+                break;
+            case 'default':
+            case 'new':
+            default:
+                $productsQuery
+                    ->orderByDesc('published_at')
+                    ->orderByDesc('id');
+                break;
+        }
+
+        $products = $productsQuery->get();
 
         return view('frontend.products.index', $this->sharedViewData([
             'category' => $category,
             'categoryTree' => $categoryTree,
             'products' => $products,
+            'currentSort' => $sort,
             'pageTitle' => $category->seo_title ?: $category->name,
             'pageDescription' => $category->seo_description,
         ]));

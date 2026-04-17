@@ -51,7 +51,7 @@
     $latestNewsItems = ($latestNews ?? collect())->take(3)->values();
     $latestNewsImage = static fn ($post, $fallback) => asset(ltrim(($post->image ?: $fallback), '/'));
     $latestNewsDate = static fn ($post) => optional($post->published_at)->format('M d, Y') ?: 'Dang cap nhat';
-    $locationProjects = ($latestProducts ?? collect())->take(4)->values();
+    $locationProjects = ($locationProjects ?? collect())->take(4)->values();
 @endphp
 
 <!-- page-title -->
@@ -220,23 +220,33 @@
                         <div class="swiper scrolling-effect effectLeft" data-preview="4" data-tablet="2"
                             data-mobile-sm="2" data-mobile="1" data-space-lg="30" data-space-md="20" data-space="15">
                             <div class="swiper-wrapper">
-                                @forelse ($locationProjects as $index => $product)
+                                @forelse ($locationProjects as $index => $location)
                                     @php
                                         $locationFallback = 'images/section/location-' . (7 + $index) . '.jpg';
-                                        $locationImage = $latestHomeImage($product->image, $locationFallback);
+                                        $locationImage = $latestHomeImage($location->image ?? null, $locationFallback);
+                                        $product = (object) [
+                                            'address' => $location->name ?? null,
+                                            'category' => null,
+                                            'unit_count_to' => null,
+                                            'unit_count_from' => null,
+                                        ];
                                         $locationLabel = $product->address ?: ($product->category->name ?? 'Đang cập nhật');
                                         $locationCount = filled($product->unit_count_to)
                                             ? $product->unit_count_to . ' căn'
                                             : (filled($product->unit_count_from) ? 'Từ ' . $product->unit_count_from . ' căn' : 'Dự án nổi bật');
+                                        $locationLabel = $location->name ?? 'Dang cap nhat';
+                                        $locationCount = (($location->projects_count ?? 0) > 0)
+                                            ? number_format((int) $location->projects_count, 0, ',', '.') . ' du an'
+                                            : 'Chua co du lieu';
                                     @endphp
                                     <div class="swiper-slide">
                                         <div class="location-item style-1 hover-image">
-                                            <a href="{{ $product->frontend_url }}" class="img-style">
+                                            <a href="{{ $location->frontend_url ?? '#' }}" class="img-style">
                                                 <img loading="lazy" decoding="async" width="428" height="590"
-                                                    src="{{ $locationImage }}" alt="{{ $product->title }}">
+                                                    src="{{ $locationImage }}" alt="{{ $locationLabel }}">
                                             </a>
                                             <div class="content">
-                                                <a href="{{ $product->frontend_url }}" class="mb_8 h5 text_primary-color">{{ $locationLabel }}</a>
+                                                <a href="{{ $location->frontend_url ?? '#' }}" class="mb_8 h5 text_primary-color">{{ $locationLabel }}</a>
                                                 <p class="text-caption-1">{{ $locationCount }}</p>
                                             </div>
                                         </div>
