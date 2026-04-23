@@ -74,8 +74,8 @@ class HomeController extends BaseFrontendController
                 ->limit(3)
                 ->get(),
             'locationProjects' => $locationProjects,
-            'pageTitle' => 'Trang chu',
-            'pageDescription' => 'Trang chu bat dong san NhaDatVN.',
+            'pageTitle' => 'Trang chủ',
+            'pageDescription' => 'Trang chủ bất động sản NhaDatVN.',
         ]));
     }
 }

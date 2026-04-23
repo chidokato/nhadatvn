@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title', $pageTitle ?? $category->name)
-@section('meta_description', $pageDescription ?? ($category->description ?: 'Danh sach san pham'))
+@section('meta_description', $pageDescription ?? ($category->description ?: 'Danh sách sản phẩm'))
 
 @push('styles')
     <style>
@@ -71,7 +71,7 @@
         };
 
         $productImage = static fn ($product) => $product->image ? asset(ltrim($product->image, '/')) : asset('images/section/properties-details-12.jpg');
-        $productPrice = static fn ($product) => $formatPrice($product->price) ?: 'Lien he';
+        $productPrice = static fn ($product) => $formatPrice($product->price) ?: 'Liên hệ';
         $productArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
         $productBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : $formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN');
         $productBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' PT' : $formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' PT');
@@ -119,8 +119,8 @@
                             <div class="tab-pane active show" id="gridLayout" role="tabpanel">
                                 @if ($products->isEmpty())
                                     <div class="product-empty-state">
-                                        <h5 class="mb_12">Chua co du an trong danh muc nay</h5>
-                                        <p class="text-body-default text_secondary-color mb-0">Noi dung se duoc cap nhat trong thoi gian toi.</p>
+                                        <h5 class="mb_12">Chưa có dự án trong danh mục này</h5>
+                                        <p class="text-body-default text_secondary-color mb-0">Nội dung se duoc cap nhat trong thoi gian toi.</p>
                                     </div>
                                 @else
                                     <div class="tf-grid-layout lg-col-3 md-col-2 product-list-grid">
@@ -136,7 +136,7 @@
                                                 <div class="img-style mb_20">
                                                     <img loading="lazy" decoding="async" src="{{ $image }}" alt="{{ $product->title }}">
                                                     <div class="wrap-tag d-flex gap_8 mb_12">
-                                                        <div class="tag sale text-button-small fw-6 text_primary-color">Du an</div>
+                                                        <div class="tag sale text-button-small fw-6 text_primary-color">Dự án</div>
                                                         @if ($product->category)
                                                             <div class="tag categoreis text-button-small fw-6 text_primary-color">{{ $product->category->name }}</div>
                                                         @endif
@@ -152,21 +152,21 @@
                                                 <div class="content">
                                                     <h4 class="price mb_12">
                                                         {{ $price }}
-                                                        @if ($price !== 'Lien he')
+                                                        @if ($price !== 'Liên hệ')
                                                             <span class="text_secondary-color text-body-default">{{ $productPriceSuffix($product) }}</span>
                                                         @endif
                                                     </h4>
                                                     <a href="{{ $product->frontend_url }}" class="title mb_8 h5 link text_primary-color">{{ $product->title }}</a>
-                                                    <p>{{ $product->address ?: 'Thong tin vi tri dang cap nhat' }}</p>
+                                                    <p>{{ $product->address ?: '...' }}</p>
                                                     <ul class="info d-flex">
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Bed"></i>{{ $bedrooms ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Bed"></i>{{ $bedrooms ?: '...' }}
                                                         </li>
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Bathstub"></i>{{ $bathrooms ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Bathstub"></i>{{ $bathrooms ?: '...' }}
                                                         </li>
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Ruler"></i>{{ $area ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Ruler"></i>{{ $area ?: '...' }}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -179,8 +179,8 @@
                             <div class="tab-pane" id="listLayout" role="tabpanel">
                                 @if ($products->isEmpty())
                                     <div class="product-empty-state">
-                                        <h5 class="mb_12">Chua co du an trong danh muc nay</h5>
-                                        <p class="text-body-default text_secondary-color mb-0">Noi dung se duoc cap nhat trong thoi gian toi.</p>
+                                        <h5 class="mb_12">Chưa có dự án trong danh mục này</h5>
+                                        <p class="text-body-default text_secondary-color mb-0">Nội dung se duoc cap nhat trong thoi gian toi.</p>
                                     </div>
                                 @else
                                     <div class="wrap-list d-grid gap_30">
@@ -205,28 +205,28 @@
                                                     <div class="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
                                                         <h4 class="price">
                                                             {{ $price }}
-                                                            @if ($price !== 'Lien he')
+                                                            @if ($price !== 'Liên hệ')
                                                                 <span class="text_secondary-color text-body-default">{{ $productPriceSuffix($product) }}</span>
                                                             @endif
                                                         </h4>
                                                         <div class="wrap-tag d-flex gap_8">
-                                                            <div class="tag sale text-button-small fw-6 text_primary-color">Du an</div>
+                                                            <div class="tag sale text-button-small fw-6 text_primary-color">Dự án</div>
                                                             @if ($product->category)
                                                                 <div class="tag categoreis text-button-small fw-6 text_primary-color">{{ $product->category->name }}</div>
                                                             @endif
                                                         </div>
                                                     </div>
                                                     <a href="{{ $product->frontend_url }}" class="title mb_8 h5 link text_primary-color">{{ $product->title }}</a>
-                                                    <p>{{ $product->address ?: 'Thong tin vi tri dang cap nhat' }}</p>
+                                                    <p>{{ $product->address ?: '...' }}</p>
                                                     <ul class="info d-flex">
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Bed"></i>{{ $bedrooms ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Bed"></i>{{ $bedrooms ?: '...' }}
                                                         </li>
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Bathstub"></i>{{ $bathrooms ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Bathstub"></i>{{ $bathrooms ?: '...' }}
                                                         </li>
                                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i class="icon-Ruler"></i>{{ $area ?: 'Dang cap nhat' }}
+                                                            <i class="icon-Ruler"></i>{{ $area ?: '...' }}
                                                         </li>
                                                     </ul>
                                                 </div>

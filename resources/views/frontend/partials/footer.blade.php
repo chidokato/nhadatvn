@@ -21,10 +21,10 @@
     ])->map(function ($column, $index) use ($footerLogo, $settings) {
         if (! filled($column['content'])) {
             $defaults = [
-                0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p><p class="mb_4 text_color-1">Dia chi:</p><p class="text_white">' . e($settings->address ?? 'Dang cap nhat dia chi') . '</p><p class="text-body-default text_secondary-color mb_16"><span class="text_color-1">Hotline:</span><span class="text_white ms_4">' . e($settings->hotline ?? 'Dang cap nhat') . '</span></p><p class="text-body-default text_secondary-color"><span class="text_color-1">Email:</span><span class="text_white ms_4">' . e($settings->email ?? 'Dang cap nhat') . '</span></p>',
-                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chu</a></li><li><a href="' . e(route('frontend.about')) . '">Gioi thieu</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tuc</a></li><li><a href="' . e(route('frontend.contact')) . '">Lien he</a></li></ul>',
-                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Gioi thieu</a></li><li><a href="' . e(route('frontend.home')) . '">Du an</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tuc</a></li><li><a href="' . e(route('frontend.contact')) . '">Lien he</a></li></ul>',
-                3 => '<p>Theo doi thong tin moi nhat tu NhaDatVN.</p>',
+                0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p><p class="mb_4 text_color-1">Địa chỉ:</p><p class="text_white">' . e($settings->address ?? '...') . '</p><p class="text-body-default text_secondary-color mb_16"><span class="text_color-1">Hotline:</span><span class="text_white ms_4">' . e($settings->hotline ?? '...') . '</span></p><p class="text-body-default text_secondary-color"><span class="text_color-1">Email:</span><span class="text_white ms_4">' . e($settings->email ?? '...') . '</span></p>',
+                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chủ</a></li><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
+                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.home')) . '">Dự án</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
+                3 => '<p>Theo dõi thông tin mới nhất từ NhaDatVN.</p>',
             ];
 
             $column['content'] = $defaults[$index] ?? '';
@@ -33,9 +33,9 @@
         if (! filled($column['title'])) {
             $defaultTitles = [
                 0 => '',
-                1 => 'Danh muc',
+                1 => 'Danh mục',
                 2 => 'Menu nhanh',
-                3 => 'Ket noi voi chung toi',
+                3 => 'Kết nối với chúng tôi',
             ];
 
             $column['title'] = $defaultTitles[$index] ?? '';
@@ -110,8 +110,8 @@
                 </button>
                 <a href="#" class="text-need">Need help?</a>
                 <ul class="mb-info">
-                    <li>Call Us Now: <span class="number">{{ $settings->hotline ?? 'Dang cap nhat' }}</span></li>
-                    <li>Support 24/7: <a href="mailto:{{ $settings->email ?? '' }}" class="link">{{ $settings->email ?? 'Dang cap nhat' }}</a></li>
+                    <li>Call Us Now: <span class="number">{{ $settings->hotline ?? '...' }}</span></li>
+                    <li>Support 24/7: <a href="mailto:{{ $settings->email ?? '' }}" class="link">{{ $settings->email ?? '...' }}</a></li>
                 </ul>
             </div>
         </div>

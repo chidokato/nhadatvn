@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('title', $pageTitle ?? $post->title)
-@section('meta_description', $pageDescription ?? ($post->summary ?: 'Chi tiet tin tuc'))
+@section('meta_description', $pageDescription ?? ($post->summary ?: 'Chi tiết tin tức'))
 
 @section('content')
 @php
@@ -64,10 +64,10 @@
                     <div class="tf-sidebar sticky-top">
                         @if (($categories ?? collect())->isNotEmpty())
                             <div class="sidebar-item sidebar-categories">
-                                <h5 class="sidebar-title mb_17">Danh muc tin tuc</h5>
+                                <h5 class="sidebar-title mb_17">Danh mục tin tức</h5>
                                 <ul class="list-categories d-grid gap_8">
                                     <li class="d-flex align-items-center justify-content-between text-body-default">
-                                        <a href="{{ route('frontend.news.index') }}" class="hover-line-text">Tat ca tin tuc</a>
+                                        <a href="{{ route('frontend.news.index') }}" class="hover-line-text">Tất cả tin tức</a>
                                     </li>
                                     @foreach ($categories as $category)
                                         <li class="d-flex align-items-center justify-content-between text-body-default">

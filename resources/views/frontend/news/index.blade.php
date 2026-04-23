@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $pageTitle ?? 'Tin tuc')
-@section('meta_description', $pageDescription ?? 'Danh sach tin tuc')
+@section('title', $pageTitle ?? 'Tin tức')
+@section('meta_description', $pageDescription ?? 'Danh sách tin tức')
 
 @php
     $formatDate = static fn ($value) => optional($value ?? null)?->format('d/m/Y');
@@ -13,10 +13,10 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="heading-section mb_30">
-                    <span class="text_primary-color text-button-small text-uppercase">Tin tuc</span>
-                    <h3 class="mt_8 mb_8">{{ $currentCategory?->name ?? 'Tin tuc moi nhat' }}</h3>
+                    <span class="text_primary-color text-button-small text-uppercase">Tin tức</span>
+                    <h3 class="mt_8 mb_8">{{ $currentCategory?->name ?? 'Tin tức mới nhất' }}</h3>
                     <p class="text-body-default">
-                        {{ $currentCategory?->description ?: 'Tong hop cac bai viet tin tuc moi nhat tu NhaDatVN.' }}
+                        {{ $currentCategory?->description ?: 'Tổng hợp các bài viết tin tức mới nhất từ NhaDatVN.' }}
                     </p>
                 </div>
 
@@ -47,14 +47,14 @@
                                 </h5>
                                 <p class="description text-body-default mb_20 line-clamp-3">{{ $description }}</p>
                                 <a href="{{ $postUrl }}" class="hover-underline-link text-button text_primary-color">
-                                    Xem chi tiet
+                                        Xem chi tiết
                                 </a>
                             </div>
                         </div>
                     @empty
                         <div class="sidebar-item">
-                            <h5 class="mb_12">Chua co bai viet</h5>
-                            <p class="text-body-default mb-0">Hien tai chua co bai tin tuc nao dang hien thi.</p>
+                                    <h5 class="mb_12">Chưa có bài viết</h5>
+                            <p class="text-body-default mb-0">Hiện tại chưa có bài tin tức nào đang hiển thị.</p>
                         </div>
                     @endforelse
                 </div>
@@ -63,11 +63,11 @@
             <div class="col-lg-4">
                 <div class="tf-sidebar sticky-top">
                     <div class="sidebar-item sidebar-categories">
-                        <h5 class="sidebar-title mb_17">Danh muc tin tuc</h5>
+                        <h5 class="sidebar-title mb_17">Danh mục tin tức</h5>
                         <ul class="list-categories d-grid gap_8">
                             <li class="d-flex align-items-center justify-content-between text-body-default">
                                 <a href="{{ route('frontend.news.index') }}" class="hover-line-text {{ $currentCategory ? '' : 'text_primary-color fw-6' }}">
-                                    Tat ca tin tuc
+                                    Tất cả tin tức
                                 </a>
                                 <div class="number">({{ $posts->count() }})</div>
                             </li>

@@ -8,6 +8,14 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/magnific-popup.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/jquery.fancybox.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/product-show.css') }}">
+    <style>
+        .project-related-card .content .wrap-tag {
+            position: static;
+            top: auto;
+            left: auto;
+            margin-bottom: 12px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -66,7 +74,7 @@
         $locationImage = filled($product->location_image ?? null) ? $product->location_image : null;
 
         $displayImage = static fn ($path) => asset(ltrim($path, '/'));
-        $displayText = static fn ($value, $fallback = 'Đang cập nhật') => filled($value) ? $value : $fallback;
+        $displayText = static fn ($value, $fallback = '...') => filled($value) ? $value : $fallback;
         $defaultSeller = (object) [
             'name' => '',
             'job_title' => '',
@@ -312,7 +320,7 @@
                             <div class="project-detail-card">
                                 <h5 class="properties-title mb_20">Vị trí dự án</h5>
                                 <p class="text-body-default text_secondary-color mb_12">
-                                    {{ $displayText($product->address, 'Thông tin địa chỉ đang được cập nhật.') }}
+                                    {{ $displayText($product->address, '...') }}
                                 </p>
                                 @if ($locationImage)
                                     <div class="project-location-image">

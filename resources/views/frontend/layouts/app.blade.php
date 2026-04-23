@@ -23,6 +23,60 @@
     <link rel="stylesheet" type="text/css" href="{{ $frontendBase }}/icons/icomoon/style.css">
     <link rel="shortcut icon" href="{{ $settings && $settings->favicon ? $frontendBase . '/' . ltrim($settings->favicon, '/') : $frontendBase . '/images/favicon.svg' }}">
     <link rel="apple-touch-icon-precomposed" href="{{ $settings && $settings->favicon ? $frontendBase . '/' . ltrim($settings->favicon, '/') : $frontendBase . '/images/favicon.svg' }}">
+    <style>
+        .customer-modal .modal-content {
+            border-radius: 24px;
+            box-shadow: 0 24px 64px rgba(14, 22, 35, 0.24);
+        }
+
+        .customer-modal .modal-header {
+            background: linear-gradient(145deg, #fffaf2 0%, #ffffff 70%);
+            border-bottom: 1px solid rgba(25, 32, 45, 0.08);
+        }
+
+        .customer-modal .modal-title {
+            font-size: 28px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        .customer-modal .modal-subtitle {
+            color: #697586;
+            font-size: 16px;
+            margin-top: 6px;
+        }
+
+        .customer-modal .customer-field label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .customer-modal .customer-field input {
+            border: 1px solid #d5dbe3;
+            border-radius: 12px;
+            padding: 13px 16px;
+            height: auto;
+            transition: all 0.2s ease;
+        }
+
+        .customer-modal .customer-field input:focus {
+            border-color: #d7df50;
+            box-shadow: 0 0 0 4px rgba(215, 223, 80, 0.16);
+        }
+
+        .customer-modal .policy-note {
+            color: #697586;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
+
+        .customer-modal .policy-note a {
+            color: #172554;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+    </style>
     @stack('styles')
 </head>
 <body>
@@ -32,40 +86,43 @@
         @include('frontend.partials.footer')
     </div>
 
-    <div class="modal fade" id="customer-info-modal" tabindex="-1" aria-labelledby="customer-info-modal-label" aria-hidden="true">
+    <div class="modal fade customer-modal" id="customer-info-modal" tabindex="-1" aria-labelledby="customer-info-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4 overflow-hidden">
+            <div class="modal-content border-0 overflow-hidden">
                 <div class="modal-header px-4 py-3 border-0">
                     <div>
-                        <h5 class="modal-title text_primary-color" id="customer-info-modal-label">Thong tin khach hang</h5>
-                        <p class="mb-0 text_secondary-color">Vui long de lai thong tin, chung toi se lien he voi ban som nhat.</p>
+                        <h5 class="modal-title text_primary-color" id="customer-info-modal-label">Thông tin khách hàng</h5>
+                        <p class="mb-0 modal-subtitle">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất.</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-4 pb-4 pt-0">
                     <form class="d-grid gap_16">
-                        <div>
-                            <label for="customer-name" class="text-button text_primary-color mb_8">Ho ten</label>
+                        <div class="customer-field">
+                            <label for="customer-name" class="text-button text_primary-color mb_8">Họ và tên</label>
                             <fieldset>
-                                <input type="text" id="customer-name" name="name" placeholder="Nhap ho ten">
+                                <input type="text" id="customer-name" name="name" placeholder="Nhập họ và tên">
                             </fieldset>
                         </div>
-                        <div>
-                            <label for="customer-phone" class="text-button text_primary-color mb_8">So dien thoai</label>
+                        <div class="customer-field">
+                            <label for="customer-phone" class="text-button text_primary-color mb_8">Số điện thoại</label>
                             <fieldset>
-                                <input type="text" id="customer-phone" name="phone" placeholder="Nhap so dien thoai">
+                                <input type="text" id="customer-phone" name="phone" placeholder="Nhập số điện thoại">
                             </fieldset>
                         </div>
-                        <div>
+                        <div class="customer-field">
                             <label for="customer-email" class="text-button text_primary-color mb_8">Email</label>
                             <fieldset>
-                                <input type="email" id="customer-email" name="email" placeholder="Nhap email">
+                                <input type="email" id="customer-email" name="email" placeholder="Nhập email">
                             </fieldset>
                         </div>
                         <button type="button" class="tf-btn border-0 w-100">
-                            <span>Gui thong tin</span>
+                            <span>Tải xuống</span>
                             <span class="bg-effect"></span>
                         </button>
+                        <p class="policy-note mb-0">
+                            ( * ) Bằng việc nhấn vào nút "tải xuống". Quý khách đồng ý với <a href="{{ route('frontend.contact') }}">chính sách bảo mật thông tin</a> của chúng tôi
+                        </p>
                     </form>
                 </div>
             </div>

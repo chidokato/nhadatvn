@@ -40,17 +40,17 @@
     $heroImage = static fn ($product, $fallback) => asset(ltrim($product->image ?: $fallback, '/'));
     $heroPrice = static fn ($product) => $formatPrice($product->price) ?: 'Liên hệ';
     $heroArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
-    $heroBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, 'PN') ?: 'Đang cập nhật');
-    $heroBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: 'Đang cập nhật');
+    $heroBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, 'PN') ?: '...');
+    $heroBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: '...');
     $latestHomeProducts = ($latestProducts ?? collect())->take(3)->values();
     $latestHomeImage = static fn ($path, $fallback) => asset(ltrim($path ?: $fallback, '/'));
-    $latestHomePrice = static fn ($product) => $formatPrice($product->price) ?: 'Lien he';
-    $latestHomeArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : ($formatRange($product->area_from, $product->area_to, ' m2') ?: 'Dang cap nhat');
-    $latestHomeBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN') ?: 'Dang cap nhat');
-    $latestHomeBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: 'Dang cap nhat');
+    $latestHomePrice = static fn ($product) => $formatPrice($product->price) ?: 'Liên hệ';
+    $latestHomeArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : ($formatRange($product->area_from, $product->area_to, ' m2') ?: '...');
+    $latestHomeBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : ($formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN') ?: '...');
+    $latestHomeBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' WC' : ($formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' WC') ?: '...');
     $latestNewsItems = ($latestNews ?? collect())->take(3)->values();
     $latestNewsImage = static fn ($post, $fallback) => asset(ltrim(($post->image ?: $fallback), '/'));
-    $latestNewsDate = static fn ($post) => optional($post->published_at)->format('M d, Y') ?: 'Dang cap nhat';
+    $latestNewsDate = static fn ($post) => optional($post->published_at)->format('M d, Y') ?: '...';
     $locationProjects = ($locationProjects ?? collect())->take(4)->values();
 @endphp
 
@@ -86,7 +86,7 @@
                                                             {{ $heroPrice($product) }}
                                                         </h4>
                                                         <h4 class="title mb_8 effect-left effect-item effect-5"><a href="{{ $product->frontend_url }}">{{ $product->title }}</a></h4>
-                                                        <p class="effect-left effect-item effect-6">{{ $product->address ?: 'Thông tin vị trí đang cập nhật' }}</p>
+                                                        <p class="effect-left effect-item effect-6">{{ $product->address ?: '...' }}</p>
                                                         <ul class="info d-flex effect-up effect-item effect-7">
                                                             <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                                                 <i class="icon-Bed"></i>{{ $heroBedrooms($product) }}
@@ -95,7 +95,7 @@
                                                                 <i class="icon-Bathstub"></i>{{ $heroBathrooms($product) }}
                                                             </li>
                                                             <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                                <i class="icon-Ruler"></i>{{ $heroArea($product) ?: 'Đang cập nhật' }}
+                                                                <i class="icon-Ruler"></i>{{ $heroArea($product) ?: '...' }}
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -179,7 +179,7 @@
                                         </div>
                                     </div>
                                     <a href="{{ $detailUrl }}" class="title mb_8 h5 link text_primary-color ">{{ $product->title }}</a>
-                                    <p>{{ $product->address ?: 'Thong tin vi tri dang cap nhat' }}</p>
+                                    <p>{{ $product->address ?: '...' }}</p>
                                     <ul class="info d-flex">
                                         <li class="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                             <i class="icon-Bed"></i>{{ $latestHomeBedrooms($product) }}
@@ -230,14 +230,14 @@
                                             'unit_count_to' => null,
                                             'unit_count_from' => null,
                                         ];
-                                        $locationLabel = $product->address ?: ($product->category->name ?? 'Đang cập nhật');
+                                        $locationLabel = $product->address ?: ($product->category->name ?? '...');
                                         $locationCount = filled($product->unit_count_to)
                                             ? $product->unit_count_to . ' căn'
                                             : (filled($product->unit_count_from) ? 'Từ ' . $product->unit_count_from . ' căn' : 'Dự án nổi bật');
-                                        $locationLabel = $location->name ?? 'Dang cap nhat';
+                                        $locationLabel = $location->name ?? '...';
                                         $locationCount = (($location->projects_count ?? 0) > 0)
-                                            ? number_format((int) $location->projects_count, 0, ',', '.') . ' du an'
-                                            : 'Chua co du lieu';
+                                            ? number_format((int) $location->projects_count, 0, ',', '.') . ' dự án'
+                                            : 'Chưa có dữ liệu';
                                     @endphp
                                     <div class="swiper-slide">
                                         <div class="location-item style-1 hover-image">
@@ -259,7 +259,7 @@
                                                     src="images/section/location-7.jpg" alt="location">
                                             </a>
                                             <div class="content">
-                                                <span class="mb_8 h5 text_primary-color d-block">Đang cập nhật</span>
+                                                <span class="mb_8 h5 text_primary-color d-block">...</span>
                                                 <p class="text-caption-1">Chưa có dữ liệu</p>
                                             </div>
                                         </div>
@@ -389,7 +389,7 @@
                                             <img loading="lazy" decoding="async" src="{{ $latestNewsImage($post, $fallbackImage) }}"
                                                 width="850" height="478" alt="{{ $post->title }}">
                                             <a href="{{ $newsUrl }}" class="tag text-label text text_primary-color text-uppercase">
-                                                {{ $post->category->name ?? 'Tin tuc' }}
+                                                {{ $post->category->name ?? 'Tin tức' }}
                                             </a>
                                             <a href="{{ $newsUrl }}" class="overlay-link"></a>
                                         </div>
@@ -410,7 +410,7 @@
                                     <div class="blog-article-item style-default hover-image-translate">
                                         <div class="article-content ">
                                             <h5 class="title ">
-                                                <a href="#" class=" hover-line-text">Chua co tin tuc moi</a>
+                                                <a href="#" class=" hover-line-text">Chưa có tin tức mới</a>
                                             </h5>
                                         </div>
                                     </div>

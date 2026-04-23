@@ -183,8 +183,8 @@ class PageController extends BaseFrontendController
             'categories' => $categories,
             'posts' => $posts,
             'recentPosts' => $posts->take(5),
-            'pageTitle' => 'Tin tuc',
-            'pageDescription' => 'Tin tuc va bai viet moi nhat.',
+            'pageTitle' => 'Tin tức',
+            'pageDescription' => 'Tin tức va bai viet moi nhat.',
         ]));
     }
 
@@ -269,16 +269,16 @@ class PageController extends BaseFrontendController
     public function about()
     {
         return view('frontend.pages.about', $this->sharedViewData([
-            'pageTitle' => 'Gioi thieu',
-            'pageDescription' => 'Thong tin gioi thieu ve cong ty.',
+            'pageTitle' => 'Giới thiệu',
+            'pageDescription' => 'Thông tin giới thiệu về công ty.',
         ]));
     }
 
     public function contact()
     {
         return view('frontend.pages.contact', $this->sharedViewData([
-            'pageTitle' => 'Lien he',
-            'pageDescription' => 'Thong tin lien he voi chung toi.',
+            'pageTitle' => 'Liên hệ',
+            'pageDescription' => 'Thông tin liên hệ voi chung toi.',
         ]));
     }
 }
