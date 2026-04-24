@@ -1,4 +1,4 @@
-@php
+﻿@php
     $frontendBase = rtrim(request()->getSchemeAndHttpHost() . request()->getBaseUrl(), '/');
     $footerLogo = $settings && $settings->footer_logo ? $frontendBase . '/' . ltrim($settings->footer_logo, '/') : $frontendBase . '/images/logo/logo-2.svg';
     $footerColumns = collect([
@@ -21,10 +21,10 @@
     ])->map(function ($column, $index) use ($footerLogo, $settings) {
         if (! filled($column['content'])) {
             $defaults = [
-                0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p><p class="mb_4 text_color-1">Địa chỉ:</p><p class="text_white">' . e($settings->address ?? '...') . '</p><p class="text-body-default text_secondary-color mb_16"><span class="text_color-1">Hotline:</span><span class="text_white ms_4">' . e($settings->hotline ?? '...') . '</span></p><p class="text-body-default text_secondary-color"><span class="text_color-1">Email:</span><span class="text_white ms_4">' . e($settings->email ?? '...') . '</span></p>',
-                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chủ</a></li><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
-                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.home')) . '">Dự án</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
-                3 => '<p>Theo dõi thông tin mới nhất từ NhaDatVN.</p>',
+                0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p>',
+                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chá»§</a></li><li><a href="' . e(route('frontend.about')) . '">Giá»›i thiá»‡u</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tá»©c</a></li><li><a href="' . e(route('frontend.contact')) . '">LiÃªn há»‡</a></li></ul>',
+                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Giá»›i thiá»‡u</a></li><li><a href="' . e(route('frontend.home')) . '">Dá»± Ã¡n</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tá»©c</a></li><li><a href="' . e(route('frontend.contact')) . '">LiÃªn há»‡</a></li></ul>',
+                3 => '<p>Theo dÃµi thÃ´ng tin má»›i nháº¥t tá»« NhaDatVN.</p>',
             ];
 
             $column['content'] = $defaults[$index] ?? '';
@@ -33,9 +33,9 @@
         if (! filled($column['title'])) {
             $defaultTitles = [
                 0 => '',
-                1 => 'Danh mục',
-                2 => 'Menu nhanh',
-                3 => 'Kết nối với chúng tôi',
+                1 => '',
+                2 => '',
+                3 => '',
             ];
 
             $column['title'] = $defaultTitles[$index] ?? '';
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="footer-bottom d-flex align-items-center justify-content-between">
-            <p class="text_muted-color">©{{ now()->year }} <a href="{{ route('frontend.home') }}" class="text_white hover-underline-link">NhaDatVN</a>. All Rights Reserved.</p>
+            <p class="text_muted-color">Â©{{ now()->year }} <a href="{{ route('frontend.home') }}" class="text_white hover-underline-link">NhaDatVN</a>. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
@@ -97,7 +97,7 @@
         <div class="mb-body">
             <ul id="menu-mobile-menu" class="style-1">
                 <li class="menu-item">
-                    <a href="{{ route('frontend.home') }}" class="item-menu-mobile">Trang chủ</a>
+                    <a href="{{ route('frontend.home') }}" class="item-menu-mobile">Trang chá»§</a>
                 </li>
                 @foreach ($menuTree ?? collect() as $menu)
                     @include('frontend.partials.mobile-menu-item', ['menu' => $menu])
@@ -105,7 +105,7 @@
             </ul>
             <div class="support">
                 <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                    <span>Tải bảng giá dự án</span>
+                    <span>Táº£i báº£ng giÃ¡ dá»± Ã¡n</span>
                     <span class="bg-effect"></span>
                 </button>
                 <a href="#" class="text-need">Need help?</a>

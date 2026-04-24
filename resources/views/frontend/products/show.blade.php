@@ -104,6 +104,23 @@
             data_get($product, 'file'),
         ])->filter(fn ($value) => filled($value))->map(fn ($value) => trim((string) $value))->first() ?? '';
         $priceListHref = filled($priceListUrl) ? ((str_starts_with($priceListUrl, 'http://') || str_starts_with($priceListUrl, 'https://')) ? $priceListUrl : $displayImage($priceListUrl)) : '#';
+        $normalizedAddressParts = collect([
+            trim((string) ($product->address ?? '')),
+            trim((string) ($product->ward->name ?? '')),
+            trim((string) (($product->province->name ?? optional($product->ward->province)->name) ?? '')),
+        ])->filter(fn ($value) => $value !== '')
+            ->reduce(function ($carry, $value) {
+                $normalized = mb_strtolower($value);
+
+                if (! collect($carry)->contains(fn ($item) => mb_strtolower($item) === $normalized)) {
+                    $carry[] = $value;
+                }
+
+                return $carry;
+            }, []);
+        $fullAddressText = ! empty($normalizedAddressParts)
+            ? implode(', ', $normalizedAddressParts)
+            : $displayText($product->address);
         $formatNumber = static fn ($value) => filled($value) ? number_format((float) $value, 0, ',', '.') : null;
         $formatDecimal = static fn ($value) => filled($value) ? rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.') : null;
         $formatPrice = static function ($value) use ($formatDecimal, $formatNumber) {
@@ -178,7 +195,7 @@
                             <li>
                                 <span class="gap_8 d-inline-flex align-items-center">
                                     <i class="icon-MapPin"></i>
-                                    <span class="text-button">{{ $displayText($product->address) }}</span>
+                                    <span class="text-button">{{ $fullAddressText }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -291,7 +308,7 @@
                                 @else
                                     <ul class="project-detail-list mb-0">
                                         <li><span>Giá bán</span><strong>{{ $priceText }}</strong></li>
-                                        <li><span>Địa chỉ</span><strong>{{ $displayText($product->address) }}</strong></li>
+                                        <li><span>Địa chỉ</span><strong>{{ $fullAddressText }}</strong></li>
                                         <li><span>Loại hình</span><strong>{{ $displayText(optional($product->category)->name) }}</strong></li>
                                         <li><span>Liên hệ tư vấn</span><strong>{{ $displayText($seller->phone ?? $defaultSeller->phone) }}</strong></li>
                                     </ul>
@@ -320,7 +337,7 @@
                             <div class="project-detail-card">
                                 <h5 class="properties-title mb_20">Vị trí dự án</h5>
                                 <p class="text-body-default text_secondary-color mb_12">
-                                    {{ $displayText($product->address, '...') }}
+                                    {{ $fullAddressText }}
                                 </p>
                                 @if ($locationImage)
                                     <div class="project-location-image">
@@ -378,8 +395,7 @@
                                         </li>
                                     @endif
                                 </ul>
-                                @if ($callPhone !== '' || $zaloPhone !== '' || filled($priceListUrl))
-                                    <div class="project-contact-actions">
+                                <div class="project-contact-actions">
                                         @if ($callPhone !== '')
                                             <a href="{{ 'tel:' . $callPhone }}" class="tf-btn btn-bg-1 w-full">
                                                 <span class="d-flex align-items-center gap_8"><i class="icon-PhoneCall"></i>Gọi hotline</span>
@@ -397,9 +413,13 @@
                                                 <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>Tải bảng giá dự án</span>
                                                 <span class="bg-effect"></span>
                                             </a>
+                                        @else
+                                            <button type="button" class="tf-btn btn-bg-primary-2 w-full border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
+                                                <span class="d-flex align-items-center gap_8"><i class="icon-DownloadSimple"></i>Tải bảng giá dự án</span>
+                                                <span class="bg-effect"></span>
+                                            </button>
                                         @endif
                                     </div>
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -592,9 +612,6 @@
     <script src="{{ asset('js/jquery.fancybox.js') }}"></script>
     <script src="{{ asset('js/magnific-popup.min.js') }}"></script>
 @endpush
-
-
-
 
 
 

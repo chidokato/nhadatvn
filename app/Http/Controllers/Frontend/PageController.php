@@ -78,7 +78,7 @@ class PageController extends BaseFrontendController
     public function legacyProductShow(string $slug)
     {
         $product = Post::query()
-            ->with(['category', 'galleryImages', 'floorPlans', 'apartments.images'])
+            ->with(['category', 'province', 'ward.province', 'galleryImages', 'floorPlans', 'apartments.images'])
             ->where('type', Post::TYPE_PRODUCT)
             ->where('is_active', true)
             ->where('slug', $slug)
@@ -116,7 +116,7 @@ class PageController extends BaseFrontendController
 
         if ($category->type === Category::TYPE_PRODUCT) {
             $product = Post::query()
-                ->with(['category', 'galleryImages', 'seller', 'floorPlans', 'apartments.images'])
+                ->with(['category', 'province', 'ward.province', 'galleryImages', 'seller', 'floorPlans', 'apartments.images'])
                 ->where('type', Post::TYPE_PRODUCT)
                 ->where('is_active', true)
                 ->where('category_id', $category->id)
