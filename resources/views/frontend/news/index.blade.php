@@ -3,6 +3,10 @@
 @section('title', $pageTitle ?? 'Tin tức')
 @section('meta_description', $pageDescription ?? 'Danh sách tin tức')
 
+@push('styles')
+<link rel="stylesheet" type="text/css" href="{{ asset('css/news-list.css') }}">
+@endpush
+
 @php
     $formatDate = static fn ($value) => optional($value ?? null)?->format('d/m/Y');
 @endphp
@@ -61,7 +65,7 @@
             </div>
 
             <div class="col-lg-4">
-                <div class="tf-sidebar sticky-top">
+                <div class="tf-sidebar sticky-top news-list-sidebar">
                     <div class="sidebar-item sidebar-categories">
                         <h5 class="sidebar-title mb_17">Danh mục tin tức</h5>
                         <ul class="list-categories d-grid gap_8">
