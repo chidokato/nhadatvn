@@ -2909,6 +2909,7 @@ a:focus, a:hover {
   }
 }
 .footer .footer-editor-logo {
+  width: 70%;
   max-width: 220px;
   height: auto;
 }
