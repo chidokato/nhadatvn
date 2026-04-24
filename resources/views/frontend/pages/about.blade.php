@@ -18,41 +18,41 @@
                                 <div class="heading d-flex justify-content-between mb_19">
                                     <div class="counter-item style-default">
                                         <div class="counter-number">
-                                            <h2 class="odometer" data-number="2022">10</h2>
+                                            <h2 class="odometer" data-number="100">10</h2>
                                         </div>
                                     </div>
                                     <div class="icon">
                                         <i class="icon-Certificate"></i>
                                     </div>
                                 </div>
-                                <h6 class="text_secondary-color sub">Ra mắt thị trường</h6>
+                                <h6 class="text_secondary-color sub">Sản phẩm ++</h6>
                             </div>
                             <div class="d-flex gap_12 bot">
                                 <div class="tf-box-icon style-1">
                                     <div class="heading d-flex justify-content-between mb_19">
                                         <div class="counter-item style-default">
                                             <div class="counter-number">
-                                                <h2 class="odometer" data-number="100">10</h2>
+                                                <h2 class="odometer" data-number="1000">10</h2>
                                             </div>
                                         </div>
                                         <div class="icon">
                                             <i class="icon-BuildingOffice"></i>
                                         </div>
                                     </div>
-                                    <h6 class="text_secondary-color sub">Giao dịch thành công</h6>
+                                    <h6 class="text_secondary-color sub">Giao dịch thành công ++</h6>
                                 </div>
                                 <div class="tf-box-icon style-1">
                                     <div class="heading d-flex justify-content-between mb_19">
                                         <div class="counter-item style-default">
                                             <div class="counter-number">
-                                                <h2 class="odometer" data-number="2">1</h2>
+                                                <h2 class="odometer" data-number="500">1</h2>
                                             </div>
                                         </div>
                                         <div class="icon">
                                             <i class="icon-ChartDonut"></i>
                                         </div>
                                     </div>
-                                    <h6 class="text_secondary-color sub">Thị trường trong & ngoài nước</h6>
+                                    <h6 class="text_secondary-color sub">Nhân sự ++</h6>
                                 </div>
                             </div>
                         </div>
@@ -280,61 +280,6 @@
             </div>
         </div>
 
-        <div class="section-agents tf-spacing-1">
-            <div class="tf-container ">
-                <div class="row align-items-center">
-                    <div class="col-lg-4">
-                        <div class="box">
-                            <div class="heading-section mb_32">
-                                <span class="sub text-uppercase fw-6 text_secondary-color-2">Ban lãnh đạo</span>
-                                <h3>Đội ngũ điều hành</h3>
-                            </div>
-                            <div class="content mb_32">
-                                <h6 class="mb_12">Kinh nghiệm thực chiến và tầm nhìn dài hạn</h6>
-                                <p class="text-body-2">Được dẫn dắt bởi đội ngũ lãnh đạo từng giữ nhiều vị trí quan trọng trong ngành, doanh nghiệp định hướng phát triển chuyên nghiệp và bền vững.</p>
-                            </div>
-                            <a href="{{ route('frontend.contact') }}" class="tf-btn btn-bg-1 btn-px-24">
-                                <span>Kết nối ngay</span>
-                                <span class="bg-effect"></span>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-7 offset-xl-1 sw-layout">
-                        <div class="swiper" data-preview="2" data-tablet="2" data-mobile="1" data-mobile-sm="2" data-space-lg="20" data-space-md="15" data-space="15">
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <div class="agent-item">
-                                        <a href="#" class="img-style">
-                                            <img loading="lazy" decoding="async" src="images/section/agent-1.jpg" width="360" height="360" alt="Lê Thị Hằng">
-                                        </a>
-                                        <div class="p-3">
-                                            <h6 class="mb_4">Bà Lê Thị Hằng</h6>
-                                            <p class="mb-0">Tổng Giám đốc</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="agent-item">
-                                        <a href="#" class="img-style">
-                                            <img loading="lazy" decoding="async" src="images/section/agent-2.jpg" width="360" height="360" alt="Nguyễn Hải Anh">
-                                        </a>
-                                        <div class="p-3">
-                                            <h6 class="mb_4">Ông Nguyễn Hải Anh</h6>
-                                            <p class="mb-0">Giám đốc Kinh doanh</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="sw-button nav-prev-layout">
-                                <i class="icon-CaretLeft"></i>
-                            </div>
-                            <div class="sw-button nav-next-layout">
-                                <i class="icon-CaretRight"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 @endsection

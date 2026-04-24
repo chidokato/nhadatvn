@@ -89,14 +89,14 @@
     <div class="modal fade customer-modal" id="customer-info-modal" tabindex="-1" aria-labelledby="customer-info-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 overflow-hidden">
-                <div class="modal-header px-4 py-3 border-0">
+                <div class="modal-header px-5 py-5 border-0">
                     <div>
                         <h5 class="modal-title text_primary-color" id="customer-info-modal-label">Thông tin khách hàng</h5>
                         <p class="mb-0 modal-subtitle">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất.</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body px-4 pb-4 pt-0">
+                <div class="modal-body px-5 pb-5 pt-0">
                     <form class="d-grid gap_16">
                         <div class="customer-field">
                             <label for="customer-name" class="text-button text_primary-color mb_8">Họ và tên</label>
