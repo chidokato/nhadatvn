@@ -42,11 +42,11 @@
             $amount = (float) $value;
 
             if ($amount >= 1000000000) {
-                return str_replace('.', ',', $formatDecimal($amount / 1000000000)) . ' ty';
+                return str_replace('.', ',', $formatDecimal($amount / 1000000000)) . ' tỷ';
             }
 
             if ($amount >= 1000000) {
-                return str_replace('.', ',', $formatDecimal($amount / 1000000)) . ' trieu';
+                return str_replace('.', ',', $formatDecimal($amount / 1000000)) . ' triệu';
             }
 
             return $formatNumber($amount) . ' VND';
@@ -75,7 +75,6 @@
         $productArea = static fn ($product) => $product->area ? $formatDecimal($product->area) . ' m2' : $formatRange($product->area_from, $product->area_to, ' m2');
         $productBedrooms = static fn ($product) => filled($product->bedroom_count) ? $product->bedroom_count . ' PN' : $formatRange($product->bedroom_count_from, $product->bedroom_count_to, ' PN');
         $productBathrooms = static fn ($product) => filled($product->bathroom_count) ? $product->bathroom_count . ' PT' : $formatRange($product->bathroom_count_from, $product->bathroom_count_to, ' PT');
-        $productPriceSuffix = static fn ($product) => filled($product->area) || filled($product->area_from) || filled($product->area_to) ? '/SqFT' : '/month';
         $currentSort = in_array(($currentSort ?? 'default'), ['default', 'new', 'old'], true) ? $currentSort : 'default';
     @endphp
 
@@ -142,19 +141,10 @@
                                                         @endif
                                                     </div>
                                                     <a href="{{ $product->frontend_url }}" class="overlay-link"></a>
-                                                    <div class="wishlist">
-                                                        <a href="javascript:void(0);" class="hover-tooltip tooltip-left box-icon">
-                                                            <span class="icon icon-Heart"></span>
-                                                            <span class="tooltip">Add to Wishlist</span>
-                                                        </a>
-                                                    </div>
                                                 </div>
                                                 <div class="content">
                                                     <h4 class="price mb_12">
                                                         {{ $price }}
-                                                        @if ($price !== 'Liên hệ')
-                                                            <span class="text_secondary-color text-body-default">{{ $productPriceSuffix($product) }}</span>
-                                                        @endif
                                                     </h4>
                                                     <a href="{{ $product->frontend_url }}" class="title mb_8 h5 link text_primary-color">{{ $product->title }}</a>
                                                     <p>{{ $product->address ?: '...' }}</p>
@@ -205,9 +195,6 @@
                                                     <div class="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
                                                         <h4 class="price">
                                                             {{ $price }}
-                                                            @if ($price !== 'Liên hệ')
-                                                                <span class="text_secondary-color text-body-default">{{ $productPriceSuffix($product) }}</span>
-                                                            @endif
                                                         </h4>
                                                         <div class="wrap-tag d-flex gap_8">
                                                             <div class="tag sale text-button-small fw-6 text_primary-color">Dự án</div>
