@@ -84,7 +84,11 @@ class PageController extends BaseFrontendController
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return redirect()->to($product->frontend_url, 301);
+        if (! $this->shouldRedirectToCanonical($product->frontend_url)) {
+            return $this->renderProductShow($product);
+        }
+
+        return redirect()->to($product->frontend_url, $this->canonicalRedirectStatus());
     }
 
     public function legacyNewsShow(string $slug)
@@ -96,7 +100,11 @@ class PageController extends BaseFrontendController
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return redirect()->to($post->frontend_url, 301);
+        if (! $this->shouldRedirectToCanonical($post->frontend_url)) {
+            return $this->renderNewsShow($post);
+        }
+
+        return redirect()->to($post->frontend_url, $this->canonicalRedirectStatus());
     }
 
     public function contentShow(string $categorySlug, string $slug)
@@ -280,5 +288,17 @@ class PageController extends BaseFrontendController
             'pageTitle' => 'Liên hệ',
             'pageDescription' => 'Thông tin liên hệ voi chung toi.',
         ]));
+    }
+
+    protected function shouldRedirectToCanonical(string $canonicalUrl): bool
+    {
+        $currentUrl = url()->current();
+
+        return rtrim($canonicalUrl, '/') !== rtrim($currentUrl, '/');
+    }
+
+    protected function canonicalRedirectStatus(): int
+    {
+        return app()->environment('local') ? 302 : 301;
     }
 }
