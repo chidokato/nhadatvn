@@ -364,9 +364,6 @@
                                         @if (filled($sellerPhone))
                                             <p>{{ $sellerPhone }}</p>
                                         @endif
-                                        @if (filled($sellerEmail))
-                                            <p>{{ $sellerEmail }}</p>
-                                        @endif
                                     </div>
                                 </div>
                                 <ul class="project-contact-list">
