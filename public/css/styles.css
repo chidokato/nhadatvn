@@ -2936,7 +2936,6 @@ a:focus, a:hover {
   gap: 12px;
 }
 .footer .footer-editor-content img {
-  max-width: 100%;
   height: auto;
 }
 .footer .footer-editor-content > *:last-child {
@@ -3017,6 +3016,7 @@ a:focus, a:hover {
 .footer.footer-refined .footer-editor-content p + ul,
 .footer.footer-refined .footer-editor-content ul + p {
   margin-top: 10px;
+  text-align: justify;
 }
 .footer.footer-refined .footer-editor-content strong,
 .footer.footer-refined .footer-editor-content b {
