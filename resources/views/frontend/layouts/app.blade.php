@@ -91,37 +91,37 @@
             <div class="modal-content border-0 overflow-hidden">
                 <div class="modal-header px-5 py-5 border-0">
                     <div>
-                        <h5 class="modal-title text_primary-color" id="customer-info-modal-label">Thông tin khách hàng</h5>
-                        <p class="mb-0 modal-subtitle">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất.</p>
+                        <h5 class="modal-title text_primary-color" id="customer-info-modal-label">Th&ocirc;ng tin kh&aacute;ch h&agrave;ng</h5>
+                        <p class="mb-0 modal-subtitle">Vui l&ograve;ng &#273;&#7875; l&#7841;i th&ocirc;ng tin, ch&uacute;ng t&ocirc;i s&#7869; li&ecirc;n h&#7879; v&#7899;i b&#7841;n s&#7899;m nh&#7845;t.</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-5 pb-5 pt-0">
                     <form class="d-grid gap_16">
                         <div class="customer-field">
-                            <label for="customer-name" class="text-button text_primary-color mb_8">Họ và tên</label>
+                            <label for="customer-name" class="text-button text_primary-color mb_8">H&#7885; v&agrave; t&ecirc;n</label>
                             <fieldset>
-                                <input type="text" id="customer-name" name="name" placeholder="Nhập họ và tên">
+                                <input type="text" id="customer-name" name="name" placeholder="Nh&#7853;p h&#7885; v&agrave; t&ecirc;n">
                             </fieldset>
                         </div>
                         <div class="customer-field">
-                            <label for="customer-phone" class="text-button text_primary-color mb_8">Số điện thoại</label>
+                            <label for="customer-phone" class="text-button text_primary-color mb_8">S&#7889; &#273;i&#7879;n tho&#7841;i</label>
                             <fieldset>
-                                <input type="text" id="customer-phone" name="phone" placeholder="Nhập số điện thoại">
+                                <input type="text" id="customer-phone" name="phone" placeholder="Nh&#7853;p s&#7889; &#273;i&#7879;n tho&#7841;i">
                             </fieldset>
                         </div>
                         <div class="customer-field">
                             <label for="customer-email" class="text-button text_primary-color mb_8">Email</label>
                             <fieldset>
-                                <input type="email" id="customer-email" name="email" placeholder="Nhập email">
+                                <input type="email" id="customer-email" name="email" placeholder="Nh&#7853;p email">
                             </fieldset>
                         </div>
                         <button type="button" class="tf-btn border-0 w-100">
-                            <span>Tải xuống</span>
+                            <span>T&#7843;i xu&#7889;ng</span>
                             <span class="bg-effect"></span>
                         </button>
                         <p class="policy-note mb-0">
-                            ( * ) Bằng việc nhấn vào nút "tải xuống". Quý khách đồng ý với <a href="{{ route('frontend.contact') }}">chính sách bảo mật thông tin</a> của chúng tôi
+                            ( * ) B&#7857;ng vi&#7879;c nh&#7845;n v&agrave;o n&uacute;t "t&#7843;i xu&#7889;ng", qu&yacute; kh&aacute;ch &#273;&#7891;ng &yacute; v&#7899;i <a href="{{ route('frontend.contact') }}">ch&iacute;nh s&aacute;ch b&#7843;o m&#7853;t th&ocirc;ng tin</a> c&#7911;a ch&uacute;ng t&ocirc;i
                         </p>
                     </form>
                 </div>

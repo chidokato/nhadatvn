@@ -47,12 +47,11 @@
 
 <footer class="footer footer-refined">
     <div class="tf-container">
-        <div class="footer-top-accent"></div>
         <div class="footer-body">
             <div class="row footer-grid">
                 @foreach ($footerColumns as $column)
                     <div class="col-lg-3 col-md-6">
-                        <div class="footer-item footer-editor-column {{ $loop->first ? 'footer-brand-column' : 'footer-info-column' }}">
+                        <div class="footer-item footer-editor-column {{ $loop->first ? 'footer-brand-column' : 'footer-info-column footer-info-column-' . $loop->iteration }}">
                             @if (filled($column['title']))
                                 <div class="footer-heading text-title fw-6 text_white mb_16">{{ $column['title'] }}</div>
                             @endif
