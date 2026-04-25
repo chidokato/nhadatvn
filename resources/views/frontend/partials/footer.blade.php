@@ -22,9 +22,9 @@
         if (! filled($column['content'])) {
             $defaults = [
                 0 => '<p class="mb_16 text_white"><img src="' . e($footerLogo) . '" alt="logo" class="main-logo footer-editor-logo"></p>',
-                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chá»§</a></li><li><a href="' . e(route('frontend.about')) . '">Giá»›i thiá»‡u</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tá»©c</a></li><li><a href="' . e(route('frontend.contact')) . '">LiÃªn há»‡</a></li></ul>',
-                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Giá»›i thiá»‡u</a></li><li><a href="' . e(route('frontend.home')) . '">Dá»± Ã¡n</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tá»©c</a></li><li><a href="' . e(route('frontend.contact')) . '">LiÃªn há»‡</a></li></ul>',
-                3 => '<p>Theo dÃµi thÃ´ng tin má»›i nháº¥t tá»« NhaDatVN.</p>',
+                1 => '<ul><li><a href="' . e(route('frontend.home')) . '">Trang chủ</a></li><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
+                2 => '<ul><li><a href="' . e(route('frontend.about')) . '">Giới thiệu</a></li><li><a href="' . e(route('frontend.home')) . '">Dự án</a></li><li><a href="' . e(route('frontend.news.index')) . '">Tin tức</a></li><li><a href="' . e(route('frontend.contact')) . '">Liên hệ</a></li></ul>',
+                3 => '<p>Theo dõi thông tin mới nhất từ NhaDatVN.</p>',
             ];
 
             $column['content'] = $defaults[$index] ?? '';
@@ -45,13 +45,14 @@
     });
 @endphp
 
-<footer class="footer">
+<footer class="footer footer-refined">
     <div class="tf-container">
+        <div class="footer-top-accent"></div>
         <div class="footer-body">
-            <div class="row">
+            <div class="row footer-grid">
                 @foreach ($footerColumns as $column)
                     <div class="col-lg-3 col-md-6">
-                        <div class="footer-item footer-editor-column">
+                        <div class="footer-item footer-editor-column {{ $loop->first ? 'footer-brand-column' : 'footer-info-column' }}">
                             @if (filled($column['title']))
                                 <div class="footer-heading text-title fw-6 text_white mb_16">{{ $column['title'] }}</div>
                             @endif
@@ -64,7 +65,7 @@
             </div>
         </div>
         <div class="footer-bottom d-flex align-items-center justify-content-between">
-            <p class="text_muted-color">Â©{{ now()->year }} <a href="{{ route('frontend.home') }}" class="text_white hover-underline-link">NhaDatVN</a>. All Rights Reserved.</p>
+            <p class="text_muted-color">&copy;{{ now()->year }} <a href="{{ route('frontend.home') }}" class="text_white hover-underline-link">NhaDatVN</a>. All Rights Reserved.</p>
         </div>
     </div>
 </footer>
@@ -97,7 +98,7 @@
         <div class="mb-body">
             <ul id="menu-mobile-menu" class="style-1">
                 <li class="menu-item">
-                    <a href="{{ route('frontend.home') }}" class="item-menu-mobile">Trang chá»§</a>
+                    <a href="{{ route('frontend.home') }}" class="item-menu-mobile">Trang chủ</a>
                 </li>
                 @foreach ($menuTree ?? collect() as $menu)
                     @include('frontend.partials.mobile-menu-item', ['menu' => $menu])
@@ -105,7 +106,7 @@
             </ul>
             <div class="support">
                 <button type="button" class="tf-btn border-0" data-bs-toggle="modal" data-bs-target="#customer-info-modal">
-                    <span>Táº£i báº£ng giÃ¡ dá»± Ã¡n</span>
+                    <span>Tải bảng giá dự án</span>
                     <span class="bg-effect"></span>
                 </button>
                 <a href="#" class="text-need">Need help?</a>
