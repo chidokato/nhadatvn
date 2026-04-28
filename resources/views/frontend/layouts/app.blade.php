@@ -121,7 +121,7 @@
                             <span class="bg-effect"></span>
                         </button>
                         <p class="policy-note mb-0">
-                            ( * ) B&#7857;ng vi&#7879;c nh&#7845;n v&agrave;o n&uacute;t "t&#7843;i xu&#7889;ng", qu&yacute; kh&aacute;ch &#273;&#7891;ng &yacute; v&#7899;i <a href="{{ route('frontend.contact') }}">ch&iacute;nh s&aacute;ch b&#7843;o m&#7853;t th&ocirc;ng tin</a> c&#7911;a ch&uacute;ng t&ocirc;i
+                            ( * ) B&#7857;ng vi&#7879;c nh&#7845;n v&agrave;o n&uacute;t "t&#7843;i xu&#7889;ng", qu&yacute; kh&aacute;ch &#273;&#7891;ng &yacute; v&#7899;i <a href="https://nhadatvn.org/noi-bo/chinh-sach-bao-mat-thong-tin-khach-hang">ch&iacute;nh s&aacute;ch b&#7843;o m&#7853;t th&ocirc;ng tin</a> c&#7911;a ch&uacute;ng t&ocirc;i
                         </p>
                     </form>
                 </div>
