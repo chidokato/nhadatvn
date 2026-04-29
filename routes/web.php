@@ -5,9 +5,11 @@ use App\Http\Controllers\Backend\AdministrativeUnitController;
 use App\Http\Controllers\Backend\ApartmentController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\ContentController;
+use App\Http\Controllers\Backend\CustomerInquiryController as BackendCustomerInquiryController;
 use App\Http\Controllers\Backend\MenuController;
 use App\Http\Controllers\Backend\SettingController;
 use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Frontend\CustomerInquiryController as FrontendCustomerInquiryController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\PageController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +40,7 @@ Route::get('/tin-tuc/{slug}', [PageController::class, 'legacyNewsShow'])->name('
 Route::get('/login', function () {
     return redirect()->route('backend.admin.login');
 })->name('login');
+Route::post('/customer-inquiries', [FrontendCustomerInquiryController::class, 'store'])->name('frontend.customer-inquiries.store');
 
 Route::prefix('admin')->name('backend.')->group(function () {
     Route::name('admin.')->group(function () {
@@ -103,6 +106,9 @@ Route::prefix('admin')->name('backend.')->group(function () {
         Route::resource('users', UserController::class)
             ->except(['show'])
             ->names('users');
+
+        Route::get('customer-inquiries', [BackendCustomerInquiryController::class, 'index'])
+            ->name('customer-inquiries.index');
 
         Route::post('uploads/editor-image', [ContentController::class, 'uploadEditorImage'])
             ->name('admin.uploads.editor-image');

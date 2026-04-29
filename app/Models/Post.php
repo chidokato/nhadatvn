@@ -111,6 +111,11 @@ class Post extends Model
         return $this->hasMany(Apartment::class, 'project_id')->latest();
     }
 
+    public function customerInquiries()
+    {
+        return $this->hasMany(CustomerInquiry::class)->latest();
+    }
+
     public function getFrontendUrlAttribute(): string
     {
         if ($this->category?->slug) {

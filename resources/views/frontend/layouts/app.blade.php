@@ -86,6 +86,32 @@
         @include('frontend.partials.footer')
     </div>
 
+    @php
+        $customerInquiryErrors = $errors->getBag('customerInquiry');
+        $customerInquiryPost = isset($product) ? $product : null;
+        $customerInquiryDownloadUrl = '';
+
+        if ($customerInquiryPost) {
+            $customerInquiryDownloadUrl = collect([
+                data_get($customerInquiryPost, 'price_list_url'),
+                data_get($customerInquiryPost, 'brochure_url'),
+                data_get($customerInquiryPost, 'download_url'),
+                data_get($customerInquiryPost, 'attachment'),
+                data_get($customerInquiryPost, 'file'),
+            ])->filter(fn ($value) => filled($value))
+                ->map(function ($value) use ($frontendBase) {
+                    $value = trim((string) $value);
+
+                    if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+                        return $value;
+                    }
+
+                    return $frontendBase . '/' . ltrim($value, '/');
+                })
+                ->first() ?? '';
+        }
+    @endphp
+
     <div class="modal fade customer-modal" id="customer-info-modal" tabindex="-1" aria-labelledby="customer-info-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 overflow-hidden">
@@ -97,26 +123,45 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-5 pb-5 pt-0">
-                    <form class="d-grid gap_16">
+                    @if (session('customer_inquiry_success'))
+                        <div class="alert alert-success mb-4" role="alert">
+                            {{ session('customer_inquiry_success') }}
+                        </div>
+                    @endif
+
+                    <form action="{{ route('frontend.customer-inquiries.store') }}" method="POST" class="d-grid gap_16">
+                        @csrf
+                        <input type="hidden" name="post_id" value="{{ old('post_id', $customerInquiryPost?->id) }}">
+                        <input type="hidden" name="source_url" value="{{ old('source_url', request()->fullUrl()) }}">
+                        <input type="hidden" name="download_url" value="{{ old('download_url', $customerInquiryDownloadUrl) }}">
                         <div class="customer-field">
                             <label for="customer-name" class="text-button text_primary-color mb_8">H&#7885; v&agrave; t&ecirc;n</label>
                             <fieldset>
-                                <input type="text" id="customer-name" name="name" placeholder="Nh&#7853;p h&#7885; v&agrave; t&ecirc;n">
+                                <input type="text" id="customer-name" name="name" value="{{ old('name') }}" placeholder="Nh&#7853;p h&#7885; v&agrave; t&ecirc;n">
                             </fieldset>
+                            @if ($customerInquiryErrors->has('name'))
+                                <div class="text-danger small mt-2">{{ $customerInquiryErrors->first('name') }}</div>
+                            @endif
                         </div>
                         <div class="customer-field">
                             <label for="customer-phone" class="text-button text_primary-color mb_8">S&#7889; &#273;i&#7879;n tho&#7841;i</label>
                             <fieldset>
-                                <input type="text" id="customer-phone" name="phone" placeholder="Nh&#7853;p s&#7889; &#273;i&#7879;n tho&#7841;i">
+                                <input type="text" id="customer-phone" name="phone" value="{{ old('phone') }}" placeholder="Nh&#7853;p s&#7889; &#273;i&#7879;n tho&#7841;i">
                             </fieldset>
+                            @if ($customerInquiryErrors->has('phone'))
+                                <div class="text-danger small mt-2">{{ $customerInquiryErrors->first('phone') }}</div>
+                            @endif
                         </div>
                         <div class="customer-field">
                             <label for="customer-email" class="text-button text_primary-color mb_8">Email</label>
                             <fieldset>
-                                <input type="email" id="customer-email" name="email" placeholder="Nh&#7853;p email">
+                                <input type="email" id="customer-email" name="email" value="{{ old('email') }}" placeholder="Nh&#7853;p email">
                             </fieldset>
+                            @if ($customerInquiryErrors->has('email'))
+                                <div class="text-danger small mt-2">{{ $customerInquiryErrors->first('email') }}</div>
+                            @endif
                         </div>
-                        <button type="button" class="tf-btn border-0 w-100">
+                        <button type="submit" class="tf-btn border-0 w-100">
                             <span>T&#7843;i xu&#7889;ng</span>
                             <span class="bg-effect"></span>
                         </button>
@@ -145,6 +190,26 @@
     <script src="{{ $frontendBase }}/js/gsap.min.js"></script>
     <script src="{{ $frontendBase }}/js/handleGsap.js"></script>
     <script src="{{ $frontendBase }}/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('customer-info-modal');
+
+            if (!modalElement || typeof bootstrap === 'undefined') {
+                return;
+            }
+
+            const shouldOpenModal = @json($customerInquiryErrors->any() || session()->has('customer_inquiry_success'));
+            const downloadUrl = @json(session('customer_inquiry_download_url'));
+
+            if (shouldOpenModal) {
+                bootstrap.Modal.getOrCreateInstance(modalElement).show();
+            }
+
+            if (downloadUrl) {
+                window.open(downloadUrl, '_blank', 'noopener');
+            }
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

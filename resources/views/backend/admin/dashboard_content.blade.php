@@ -86,6 +86,7 @@
                 <div class="card-body d-grid gap-2">
                     <a href="{{ route('backend.users.create') }}" class="btn btn-primary">Them user moi</a>
                     <a href="{{ route('backend.users.index') }}" class="btn btn-soft-primary">Danh sach user</a>
+                    <a href="{{ route('backend.customer-inquiries.index') }}" class="btn btn-soft-info">Khach hang gui form</a>
                 </div>
             </div>
         </div>

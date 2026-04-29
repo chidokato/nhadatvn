@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerInquiry;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,17 +47,29 @@ class AdminController extends Controller
     public function index()
     {
         $stats = [
-            'properties' => 128,
-            'agents' => 24,
-            'customers' => 486,
-            'pending_posts' => 12,
+            'properties' => Post::query()->where('type', Post::TYPE_PRODUCT)->count(),
+            'agents' => User::query()->count(),
+            'customers' => CustomerInquiry::query()->count(),
+            'pending_posts' => Post::query()->where('type', Post::TYPE_PRODUCT)->where('is_active', false)->count(),
         ];
 
-        $activities = [
-            ['title' => 'Bai dang moi cho duyet', 'detail' => '12 bat dong san dang cho kiem duyet.'],
-            ['title' => 'Khach hang moi', 'detail' => '8 khach hang vua tao tai khoan trong hom nay.'],
-            ['title' => 'Lich hen xem nha', 'detail' => '5 lich hen duoc dat trong buoi chieu.'],
-        ];
+        $latestInquiries = CustomerInquiry::query()
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        $activities = $latestInquiries->map(function (CustomerInquiry $inquiry) {
+            return [
+                'title' => 'Khach hang moi: ' . $inquiry->name,
+                'detail' => trim($inquiry->phone . ($inquiry->project_title ? ' | ' . $inquiry->project_title : '')),
+            ];
+        })->all();
+
+        if ($activities === []) {
+            $activities = [
+                ['title' => 'Chua co khach hang moi', 'detail' => 'Form thong tin khach hang se hien thi tai day sau khi co nguoi gui.'],
+            ];
+        }
 
         return view('backend.admin.dashboard_content', compact('stats', 'activities'));
     }
