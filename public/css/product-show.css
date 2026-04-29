@@ -43,6 +43,10 @@
     white-space: normal !important;
 }
 
+.project-detail-content h3{ font-size:2rem }
+.project-detail-content ul{ padding-left: 2rem; }
+.project-detail-content ul li{     list-style: circle; }
+
 .project-detail-card {
     padding: 20px;
     border-radius: 24px;
