@@ -300,7 +300,7 @@
                     <div class="col-lg-8">
                         <div id="chinh-sach-ban-hang" class="section tf-spacing-9 mb-5">
                             <div class="project-detail-card">
-                                <h5 class="properties-title mb_20">CS bán hàng</h5>
+                                <!-- <h5 class="properties-title mb_20">CS bán hàng</h5> -->
                                 @if (filled(trim(strip_tags((string) ($product->sales_policy ?? '')))))
                                     <div class="project-detail-content">
                                         {!! $product->sales_policy !!}
