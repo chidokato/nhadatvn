@@ -285,8 +285,8 @@
                 <div class="tf-container">
                     <ul class="tab-slide overflow-x-auto" id="navbar">
                         <li class="text-button nav-tab-item text_primary-color active"><a href="#chinh-sach-ban-hang" class="nav_link">CS bán hàng</a></li>
-                        <li class="text-button nav-tab-item text_primary-color"><a href="#tong-quan" class="nav_link">Tổng quan</a></li>
                         <li class="text-button nav-tab-item text_primary-color"><a href="#vi-tri" class="nav_link">Vị trí</a></li>
+                        <li class="text-button nav-tab-item text_primary-color"><a href="#tong-quan" class="nav_link">Tổng quan</a></li>
                         <li class="text-button nav-tab-item text_primary-color"><a href="#tien-ich" class="nav_link">Tiện ích</a></li>
                         <li class="text-button nav-tab-item text_primary-color"><a href="#noi-that" class="nav_link">Nội thất</a></li>
                         <li class="text-button nav-tab-item text_primary-color"><a href="#mat-bang" class="nav_link">Mặt bằng</a></li>
@@ -297,7 +297,7 @@
 
             <div class="tf-container">
                 <div class="row">
-                    <div class="col-lg-8">
+                                        <div class="col-lg-8">
                         <div id="chinh-sach-ban-hang" class="section tf-spacing-9 mb-5">
                             <div class="project-detail-card">
                                 <!-- <h5 class="properties-title mb_20">CS bán hàng</h5> -->
@@ -316,23 +316,6 @@
                             </div>
                         </div>
 
-                        <div id="tong-quan" class="section tf-spacing-9 pt-0 mb-5">
-                            @if (filled(trim(strip_tags((string) $product->summary))))
-                                <div class="project-summary mb_24">
-                                    <h5 class="properties-title mb_12">{{ $product->title }}</h5>
-                                    <div class="project-detail-content text-body-default text_secondary-color mb-0">
-                                        {!! $product->summary !!}
-                                    </div>
-                                </div>
-                            @endif
-
-                            <div class="project-detail-card mt_24">
-                                <h5 class="properties-title mb_20">Mô tả dự án</h5>
-                                <div class="project-detail-content">
-                                    {!! $product->content ?: '<p>Thông tin mô tả đang được cập nhật.</p>' !!}
-                                </div>
-                            </div>
-                        </div>
                         <div id="vi-tri" class="section tf-spacing-9 pt-0 mb-5">
                             <div class="project-detail-card">
                                 <h5 class="properties-title mb_20">Vị trí dự án</h5>
@@ -356,12 +339,23 @@
                             </div>
                         </div>
 
-                        
+                        <div id="tong-quan" class="section tf-spacing-9 pt-0 mb-5">
+                            @if (filled(trim(strip_tags((string) $product->summary))))
+                                <div class="project-summary mb_24">
+                                    <h5 class="properties-title mb_12">{{ $product->title }}</h5>
+                                    <div class="project-detail-content text-body-default text_secondary-color mb-0">
+                                        {!! $product->summary !!}
+                                    </div>
+                                </div>
+                            @endif
 
-                        
-
-                        
-                        
+                            <div class="project-detail-card mt_24">
+                                <h5 class="properties-title mb_20">Mô tả dự án</h5>
+                                <div class="project-detail-content">
+                                    {!! $product->content ?: '<p>Thông tin mô tả đang được cập nhật.</p>' !!}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-4">
@@ -612,6 +606,9 @@
     <script src="{{ asset('js/jquery.fancybox.js') }}"></script>
     <script src="{{ asset('js/magnific-popup.min.js') }}"></script>
 @endpush
+
+
+
 
 
 
